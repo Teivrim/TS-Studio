@@ -9,6 +9,8 @@ class AppTheme {
   static const Color activeStepColor = Color(0xFF7C4DFF);
   static const Color inactiveStepColor = Color(0xFF3A3A3A);
   static const Color playheadColor = Color(0xFF00E5FF);
+  static const Color dangerColor = Color(0xFFE91E63);
+  static const Color successColor = Color(0xFF4CAF50);
 
   static ThemeData get darkTheme {
     return ThemeData(
@@ -24,6 +26,11 @@ class AppTheme {
         backgroundColor: surfaceColor,
         elevation: 0,
         centerTitle: true,
+      ),
+      sliderTheme: SliderThemeData(
+        trackHeight: 4,
+        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+        overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
       ),
     );
   }

@@ -1,7 +1,7 @@
 name: ts_studio
 description: Teivrim Sound Studio (TS Studio) - мобильная музыкальная студия для Android
 publish_to: 'none'
-version: 0.1.0+1
+version: 0.2.0+1
 
 environment:
   sdk: ^3.6.0
@@ -12,6 +12,7 @@ dependencies:
   flutter_riverpod: ^2.6.1
   audioplayers: ^6.1.0
   path_provider: ^2.1.4
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

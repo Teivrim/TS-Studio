@@ -5,11 +5,15 @@ import '../theme/app_theme.dart';
 class TrackHeader extends StatelessWidget {
   final Track track;
   final VoidCallback onMute;
+  final ValueChanged<double> onVolumeChanged;
+  final ValueChanged<double> onPanChanged;
 
   const TrackHeader({
     super.key,
     required this.track,
     required this.onMute,
+    required this.onVolumeChanged,
+    required this.onPanChanged,
   });
 
   @override
@@ -18,7 +22,6 @@ class TrackHeader extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: Row(
         children: [
-          // Color indicator
           Container(
             width: 4,
             height: 32,
@@ -28,19 +31,44 @@ class TrackHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          // Track name
           Expanded(
-            child: Text(
-              track.name,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: track.muted ? Colors.white38 : Colors.white,
-              ),
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  track.name,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: track.muted ? Colors.white38 : Colors.white,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Slider(
+                        value: track.volume,
+                        min: 0,
+                        max: 1,
+                        activeColor: AppTheme.primaryColor,
+                        inactiveColor: AppTheme.gridColor,
+                        onChanged: onVolumeChanged,
+                      ),
+                    ),
+                    SizedBox(
+                      width: 40,
+                      child: Text(
+                        '${(track.volume * 100).round()}%',
+                        style: const TextStyle(fontSize: 8, color: Colors.white54),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
-          // Mute button
           GestureDetector(
             onTap: onMute,
             child: Container(

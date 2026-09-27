@@ -5,10 +5,16 @@
 ## Функционал
 
 - **Step Sequencer** — сетка 16 шагов для создания битов и мелодий
-- **6 треков** — Kick, Snare, Hi-Hat, Bass, Synth, Pad
+- **8 треков** — Kick, Snare, Hi-Hat, Bass, Synth, Pad, Lead, Pluck
 - **Управление воспроизведением** — Play/Pause/Stop
 - **Настройка BPM** — от 60 до 200 BPM
 - **Mute треков** — отключение отдельных дорожек
+- **Громкость треков** — индивидуальная громкость каждого трека
+- **Панорама треков** — настройка панорамы
+- **Master Volume** — общая громкость
+- **Эффекты** — Reverb, Delay (mix и time)
+- **Сохранение проектов** — сохранение и загрузка проектов
+- **Экспорт WAV** — экспорт проекта в WAV файл
 - **Очистка** — сброс всех шагов
 
 ## Технологии
@@ -16,12 +22,14 @@
 - Flutter (Dart)
 - Flutter Riverpod — управление состоянием
 - Audioplayers — воспроизведение звука
+- Path Provider — файловая система
+- Permission Handler — разрешения
 
 ## Установка и запуск
 
 ```bash
 # Клонировать репозиторий
-git clone https://github.comTeivrim/TS-Studio.git
+git clone https://github.com/Teivrim/TS-Studio.git
 
 # Перейти в папку проекта
 cd TS-Studio
@@ -43,19 +51,24 @@ lib/
 ├── widgets/
 │   ├── step_sequencer.dart   # Виджет сетки секвенсора
 │   ├── track_header.dart     # Заголовок трека
-│   └── transport_controls.dart # Кнопки управления
+│   ├── transport_controls.dart # Кнопки управления
+│   ├── effects_panel.dart    # Панель эффектов
+│   └── project_dialog.dart   # Диалог сохранения
 ├── models/
 │   └── track.dart            # Модели данных
 ├── services/
-│   └── audio_service.dart    # Аудио-сервис
+│   ├── audio_service.dart    # Аудио-сервис
+│   ├── project_service.dart  # Сервис проектов
+│   └── export_service.dart   # Сервис экспорта
 └── theme/
     └── app_theme.dart        # Тема приложения
 ```
 
 ## Планы
 
-- [ ] Реальный звук (сэмплы и синтез)
-- [ ] Экспорт в WAV/MP3
-- [ ] Эффекты (реверб, дилей, эквалайзер)
-- [ ] Сохранение/загрузка проектов
-- [ ] Больше треков и инструментов
+- [ ] Реальные сэмплы и звук
+- [ ] Экспорт в MP3
+- [ ] Эквалайзер
+- [ ] Больше эффектов
+- [ ] Аудио запись с микрофона
+- [ ] Поддержка Android

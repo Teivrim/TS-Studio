@@ -8,6 +8,8 @@ class StepSequencer extends StatelessWidget {
   final int currentStep;
   final void Function(int trackIndex, int stepIndex) onStepToggle;
   final void Function(int trackIndex) onTrackMute;
+  final void Function(int trackIndex, double volume) onTrackVolume;
+  final void Function(int trackIndex, double pan) onTrackPan;
 
   const StepSequencer({
     super.key,
@@ -15,18 +17,19 @@ class StepSequencer extends StatelessWidget {
     required this.currentStep,
     required this.onStepToggle,
     required this.onTrackMute,
+    required this.onTrackVolume,
+    required this.onTrackPan,
   });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Step numbers header
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Row(
             children: [
-              const SizedBox(width: 120), // Space for track headers
+              const SizedBox(width: 120),
               ...List.generate(16, (index) {
                 final isCurrentStep = index == currentStep;
                 final isBeat = index % 4 == 0;
@@ -60,7 +63,6 @@ class StepSequencer extends StatelessWidget {
           ),
         ),
         const Divider(height: 1),
-        // Track rows
         Expanded(
           child: ListView.builder(
             itemCount: tracks.length,
@@ -72,6 +74,8 @@ class StepSequencer extends StatelessWidget {
                 currentStep: currentStep,
                 onStepToggle: onStepToggle,
                 onTrackMute: onTrackMute,
+                onTrackVolume: onTrackVolume,
+                onTrackPan: onTrackPan,
               );
             },
           ),
@@ -87,6 +91,8 @@ class _TrackRow extends StatelessWidget {
   final int currentStep;
   final void Function(int trackIndex, int stepIndex) onStepToggle;
   final void Function(int trackIndex) onTrackMute;
+  final void Function(int trackIndex, double volume) onTrackVolume;
+  final void Function(int trackIndex, double pan) onTrackPan;
 
   const _TrackRow({
     required this.track,
@@ -94,6 +100,8 @@ class _TrackRow extends StatelessWidget {
     required this.currentStep,
     required this.onStepToggle,
     required this.onTrackMute,
+    required this.onTrackVolume,
+    required this.onTrackPan,
   });
 
   @override
@@ -107,15 +115,15 @@ class _TrackRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Track header
           SizedBox(
             width: 120,
             child: TrackHeader(
               track: track,
               onMute: () => onTrackMute(trackIndex),
+              onVolumeChanged: (v) => onTrackVolume(trackIndex, v),
+              onPanChanged: (p) => onTrackPan(trackIndex, p),
             ),
           ),
-          // Steps
           Expanded(
             child: Row(
               children: List.generate(16, (stepIndex) {

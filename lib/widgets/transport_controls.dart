@@ -29,7 +29,6 @@ class TransportControls extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Play/Pause button
           _TransportButton(
             icon: isPlaying ? Icons.pause : Icons.play_arrow,
             color: AppTheme.accentColor,
@@ -37,7 +36,6 @@ class TransportControls extends StatelessWidget {
             size: 48,
           ),
           const SizedBox(width: 12),
-          // Stop button
           _TransportButton(
             icon: Icons.stop,
             color: Colors.white70,
@@ -45,7 +43,6 @@ class TransportControls extends StatelessWidget {
             size: 40,
           ),
           const SizedBox(width: 24),
-          // BPM control
           Expanded(
             child: Row(
               children: [
@@ -55,12 +52,8 @@ class TransportControls extends StatelessWidget {
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       trackHeight: 4,
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 8,
-                      ),
-                      overlayShape: const RoundSliderOverlayShape(
-                        overlayRadius: 16,
-                      ),
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
                     ),
                     child: Slider(
                       value: bpm.toDouble(),
