@@ -9,6 +9,7 @@ class Track {
   final double volume;
   final double pan;
   final bool muted;
+  final String sampleFile;
   final String soundType;
 
   const Track({
@@ -19,6 +20,7 @@ class Track {
     this.volume = 0.8,
     this.pan = 0.0,
     this.muted = false,
+    this.sampleFile = '',
     this.soundType = 'synth',
   });
 
@@ -29,6 +31,7 @@ class Track {
     double? volume,
     double? pan,
     bool? muted,
+    String? sampleFile,
     String? soundType,
   }) {
     return Track(
@@ -39,6 +42,7 @@ class Track {
       volume: volume ?? this.volume,
       pan: pan ?? this.pan,
       muted: muted ?? this.muted,
+      sampleFile: sampleFile ?? this.sampleFile,
       soundType: soundType ?? this.soundType,
     );
   }
@@ -51,6 +55,7 @@ class Track {
     'volume': volume,
     'pan': pan,
     'muted': muted,
+    'sampleFile': sampleFile,
     'soundType': soundType,
   };
 
@@ -62,6 +67,7 @@ class Track {
     volume: (json['volume'] as num).toDouble(),
     pan: (json['pan'] as num).toDouble(),
     muted: json['muted'] as bool,
+    sampleFile: json['sampleFile'] as String? ?? '',
     soundType: json['soundType'] as String? ?? 'synth',
   );
 }
@@ -76,6 +82,14 @@ class SequencerState {
   final double reverbMix;
   final double delayMix;
   final double delayTime;
+  final double eqLow;
+  final double eqMid;
+  final double eqHigh;
+  final double distortion;
+  final double chorus;
+  final double filterCutoff;
+  final bool isRecording;
+  final String? recordingPath;
 
   const SequencerState({
     required this.tracks,
@@ -87,6 +101,14 @@ class SequencerState {
     this.reverbMix = 0.0,
     this.delayMix = 0.0,
     this.delayTime = 0.25,
+    this.eqLow = 0.5,
+    this.eqMid = 0.5,
+    this.eqHigh = 0.5,
+    this.distortion = 0.0,
+    this.chorus = 0.0,
+    this.filterCutoff = 1.0,
+    this.isRecording = false,
+    this.recordingPath,
   });
 
   SequencerState copyWith({
@@ -98,6 +120,14 @@ class SequencerState {
     double? reverbMix,
     double? delayMix,
     double? delayTime,
+    double? eqLow,
+    double? eqMid,
+    double? eqHigh,
+    double? distortion,
+    double? chorus,
+    double? filterCutoff,
+    bool? isRecording,
+    String? recordingPath,
   }) {
     return SequencerState(
       tracks: tracks ?? this.tracks,
@@ -109,6 +139,14 @@ class SequencerState {
       reverbMix: reverbMix ?? this.reverbMix,
       delayMix: delayMix ?? this.delayMix,
       delayTime: delayTime ?? this.delayTime,
+      eqLow: eqLow ?? this.eqLow,
+      eqMid: eqMid ?? this.eqMid,
+      eqHigh: eqHigh ?? this.eqHigh,
+      distortion: distortion ?? this.distortion,
+      chorus: chorus ?? this.chorus,
+      filterCutoff: filterCutoff ?? this.filterCutoff,
+      isRecording: isRecording ?? this.isRecording,
+      recordingPath: recordingPath ?? this.recordingPath,
     );
   }
 
@@ -119,6 +157,12 @@ class SequencerState {
     'reverbMix': reverbMix,
     'delayMix': delayMix,
     'delayTime': delayTime,
+    'eqLow': eqLow,
+    'eqMid': eqMid,
+    'eqHigh': eqHigh,
+    'distortion': distortion,
+    'chorus': chorus,
+    'filterCutoff': filterCutoff,
   };
 
   factory SequencerState.fromJson(Map<String, dynamic> json) => SequencerState(
@@ -128,5 +172,11 @@ class SequencerState {
     reverbMix: (json['reverbMix'] as num).toDouble(),
     delayMix: (json['delayMix'] as num).toDouble(),
     delayTime: (json['delayTime'] as num).toDouble(),
+    eqLow: (json['eqLow'] as num?)?.toDouble() ?? 0.5,
+    eqMid: (json['eqMid'] as num?)?.toDouble() ?? 0.5,
+    eqHigh: (json['eqHigh'] as num?)?.toDouble() ?? 0.5,
+    distortion: (json['distortion'] as num?)?.toDouble() ?? 0.0,
+    chorus: (json['chorus'] as num?)?.toDouble() ?? 0.0,
+    filterCutoff: (json['filterCutoff'] as num?)?.toDouble() ?? 1.0,
   );
 }

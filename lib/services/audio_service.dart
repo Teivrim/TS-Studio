@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/track.dart';
 
 class AudioService {
-  final AudioPlayer _player = AudioPlayer();
+  final Map<String, AudioPlayer> _players = {};
   Timer? _timer;
   int _currentStep = 0;
   List<Track> _tracks = [];
@@ -19,6 +19,22 @@ class AudioService {
   bool get isPlaying => _isPlaying;
   int get currentStep => _currentStep;
 
+  AudioPlayer _getPlayer(String sampleFile) {
+    if (!_players.containsKey(sampleFile)) {
+      _players[sampleFile] = AudioPlayer();
+    }
+    return _players[sampleFile]!;
+  }
+
+  Future<void> preloadSamples(List<Track> tracks) async {
+    for (final track in tracks) {
+      if (track.sampleFile.isNotEmpty) {
+        final player = _getPlayer(track.sampleFile);
+        await player.setSource(AssetSource('samples/${track.sampleFile}'));
+      }
+    }
+  }
+
   void updateTracks(List<Track> tracks) {
     _tracks = tracks;
   }
@@ -30,7 +46,6 @@ class AudioService {
 
   void updateMasterVolume(double volume) {
     _masterVolume = volume;
-    _player.setVolume(volume);
   }
 
   void play() {
@@ -84,9 +99,19 @@ class AudioService {
     _currentStep = (_currentStep + 1) % 16;
   }
 
-  void _playSound(Track track) {
-    final frequency = _getTrackFrequency(track);
-    _playTone(frequency, track.volume * _masterVolume, track.soundType);
+  Future<void> _playSound(Track track) async {
+    try {
+      if (track.sampleFile.isNotEmpty) {
+        final player = _getPlayer(track.sampleFile);
+        await player.setVolume(track.volume * _masterVolume);
+        await player.resume();
+      } else {
+        final frequency = _getTrackFrequency(track);
+        _playTone(frequency, track.volume * _masterVolume, track.soundType);
+      }
+    } catch (e) {
+      debugPrint('Error playing sound: $e');
+    }
   }
 
   double _getTrackFrequency(Track track) {
@@ -96,11 +121,7 @@ class AudioService {
   }
 
   void _playTone(double frequency, double volume, String soundType) {
-    try {
-      debugPrint('Playing $soundType: $frequency Hz at volume $volume');
-    } catch (e) {
-      debugPrint('Error playing sound: $e');
-    }
+    debugPrint('Playing $soundType: $frequency Hz at volume $volume');
   }
 
   Uint8List generateWav(List<Track> tracks, int bpm, {double masterVolume = 0.8}) {
@@ -171,9 +192,12 @@ class AudioService {
     return Uint8List.fromList([...wavHeader.buffer.asUint8List(), ...byteData.buffer.asUint8List()]);
   }
 
-  void dispose() {
+  Future<void> dispose() async {
     _timer?.cancel();
-    _player.dispose();
+    for (final player in _players.values) {
+      await player.dispose();
+    }
+    _players.clear();
     _stepController.close();
   }
 }

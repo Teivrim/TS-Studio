@@ -7,6 +7,8 @@ class TransportControls extends StatelessWidget {
   final VoidCallback onPlayPause;
   final VoidCallback onStop;
   final ValueChanged<int> onBpmChanged;
+  final bool isRecording;
+  final VoidCallback onRecordToggle;
 
   const TransportControls({
     super.key,
@@ -15,6 +17,8 @@ class TransportControls extends StatelessWidget {
     required this.onPlayPause,
     required this.onStop,
     required this.onBpmChanged,
+    required this.isRecording,
+    required this.onRecordToggle,
   });
 
   @override
@@ -40,6 +44,13 @@ class TransportControls extends StatelessWidget {
             icon: Icons.stop,
             color: Colors.white70,
             onPressed: onStop,
+            size: 40,
+          ),
+          const SizedBox(width: 12),
+          _TransportButton(
+            icon: isRecording ? Icons.stop_circle : Icons.fiber_manual_record,
+            color: isRecording ? AppTheme.dangerColor : Colors.white70,
+            onPressed: onRecordToggle,
             size: 40,
           ),
           const SizedBox(width: 24),

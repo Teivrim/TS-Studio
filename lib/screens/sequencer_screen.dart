@@ -4,6 +4,7 @@ import '../models/track.dart';
 import '../services/audio_service.dart';
 import '../services/project_service.dart';
 import '../services/export_service.dart';
+import '../services/recording_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/step_sequencer.dart';
 import '../widgets/transport_controls.dart';
@@ -23,6 +24,12 @@ final exportServiceProvider = Provider<ExportService>((ref) {
   return ExportService(audioService);
 });
 
+final recordingServiceProvider = Provider<RecordingService>((ref) {
+  final service = RecordingService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
   return SequencerNotifier(audioService);
@@ -40,14 +47,14 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
 
   static SequencerState _initialState() {
     final tracks = [
-      Track(id: '1', name: 'Kick', color: 0xFFE91E63, steps: List.filled(16, false), soundType: 'kick'),
-      Track(id: '2', name: 'Snare', color: 0xFF9C27B0, steps: List.filled(16, false), soundType: 'snare'),
-      Track(id: '3', name: 'Hi-Hat', color: 0xFF3F51B5, steps: List.filled(16, false), soundType: 'hihat'),
-      Track(id: '4', name: 'Bass', color: 0xFF009688, steps: List.filled(16, false), soundType: 'bass'),
-      Track(id: '5', name: 'Synth', color: 0xFFFF9800, steps: List.filled(16, false), soundType: 'synth'),
-      Track(id: '6', name: 'Pad', color: 0xFF4CAF50, steps: List.filled(16, false), soundType: 'pad'),
-      Track(id: '7', name: 'Lead', color: 0xFFE53935, steps: List.filled(16, false), soundType: 'lead'),
-      Track(id: '8', name: 'Pluck', color: 0xFF8BC34A, steps: List.filled(16, false), soundType: 'pluck'),
+      Track(id: '1', name: 'Kick', color: 0xFFE91E63, steps: List.filled(16, false), sampleFile: 'kick.wav', soundType: 'kick'),
+      Track(id: '2', name: 'Snare', color: 0xFF9C27B0, steps: List.filled(16, false), sampleFile: 'snare.wav', soundType: 'snare'),
+      Track(id: '3', name: 'Hi-Hat', color: 0xFF3F51B5, steps: List.filled(16, false), sampleFile: 'hihat.wav', soundType: 'hihat'),
+      Track(id: '4', name: 'Bass', color: 0xFF009688, steps: List.filled(16, false), sampleFile: 'bass.wav', soundType: 'bass'),
+      Track(id: '5', name: 'Synth', color: 0xFFFF9800, steps: List.filled(16, false), sampleFile: 'synth.wav', soundType: 'synth'),
+      Track(id: '6', name: 'Pad', color: 0xFF4CAF50, steps: List.filled(16, false), sampleFile: 'pad.wav', soundType: 'pad'),
+      Track(id: '7', name: 'Lead', color: 0xFFE53935, steps: List.filled(16, false), sampleFile: 'lead.wav', soundType: 'lead'),
+      Track(id: '8', name: 'Pluck', color: 0xFF8BC34A, steps: List.filled(16, false), sampleFile: 'pluck.wav', soundType: 'pluck'),
     ];
 
     tracks[0].steps[0] = true;
@@ -140,6 +147,30 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     state = state.copyWith(delayTime: time);
   }
 
+  void setEqLow(double value) {
+    state = state.copyWith(eqLow: value);
+  }
+
+  void setEqMid(double value) {
+    state = state.copyWith(eqMid: value);
+  }
+
+  void setEqHigh(double value) {
+    state = state.copyWith(eqHigh: value);
+  }
+
+  void setDistortion(double value) {
+    state = state.copyWith(distortion: value);
+  }
+
+  void setChorus(double value) {
+    state = state.copyWith(chorus: value);
+  }
+
+  void setFilterCutoff(double value) {
+    state = state.copyWith(filterCutoff: value);
+  }
+
   void clearAll() {
     final newTracks = state.tracks.map((track) {
       return track.copyWith(steps: List.filled(16, false));
@@ -154,6 +185,10 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     _audioService.updateBpm(newState.bpm);
     _audioService.updateMasterVolume(newState.masterVolume);
   }
+
+  void setRecordingState(bool isRecording, String? path) {
+    state = state.copyWith(isRecording: isRecording, recordingPath: path);
+  }
 }
 
 class SequencerScreen extends ConsumerWidget {
@@ -165,6 +200,7 @@ class SequencerScreen extends ConsumerWidget {
     final notifier = ref.read(sequencerProvider.notifier);
     final projectService = ref.read(projectServiceProvider);
     final exportService = ref.read(exportServiceProvider);
+    final recordingService = ref.read(recordingServiceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -206,6 +242,8 @@ class SequencerScreen extends ConsumerWidget {
             onPlayPause: () => notifier.togglePlay(),
             onStop: () => notifier.stop(),
             onBpmChanged: (bpm) => notifier.setBpm(bpm),
+            isRecording: state.isRecording,
+            onRecordToggle: () => _toggleRecording(context, ref, recordingService, notifier),
           ),
           Expanded(
             child: StepSequencer(
@@ -225,14 +263,46 @@ class SequencerScreen extends ConsumerWidget {
             reverbMix: state.reverbMix,
             delayMix: state.delayMix,
             delayTime: state.delayTime,
+            eqLow: state.eqLow,
+            eqMid: state.eqMid,
+            eqHigh: state.eqHigh,
+            distortion: state.distortion,
+            chorus: state.chorus,
+            filterCutoff: state.filterCutoff,
             onMasterVolumeChanged: (v) => notifier.setMasterVolume(v),
             onReverbMixChanged: (v) => notifier.setReverbMix(v),
             onDelayMixChanged: (v) => notifier.setDelayMix(v),
             onDelayTimeChanged: (v) => notifier.setDelayTime(v),
+            onEqLowChanged: (v) => notifier.setEqLow(v),
+            onEqMidChanged: (v) => notifier.setEqMid(v),
+            onEqHighChanged: (v) => notifier.setEqHigh(v),
+            onDistortionChanged: (v) => notifier.setDistortion(v),
+            onChorusChanged: (v) => notifier.setChorus(v),
+            onFilterCutoffChanged: (v) => notifier.setFilterCutoff(v),
           ),
         ],
       ),
     );
+  }
+
+  void _toggleRecording(BuildContext context, WidgetRef ref, RecordingService recordingService, SequencerNotifier notifier) async {
+    if (recordingService.isRecording) {
+      final path = await recordingService.stopRecording();
+      notifier.setRecordingState(false, path);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Запись сохранена: $path')),
+        );
+      }
+    } else {
+      final path = await recordingService.startRecording();
+      notifier.setRecordingState(true, path);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Запись началась...')),
+        );
+      }
+    }
   }
 
   void _showSaveDialog(BuildContext context, WidgetRef ref, SequencerState state) {
