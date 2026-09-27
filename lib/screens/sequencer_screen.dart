@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/track.dart';
+import '../models/pattern.dart';
 import '../services/audio_service.dart';
 import '../services/project_service.dart';
 import '../services/export_service.dart';
 import '../services/recording_service.dart';
+import '../services/pattern_service.dart';
+import '../services/history_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/step_sequencer.dart';
 import '../widgets/transport_controls.dart';
 import '../widgets/effects_panel.dart';
 import '../widgets/project_dialog.dart';
+import '../widgets/pattern_dialog.dart';
+import '../widgets/preset_dialog.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -30,6 +35,10 @@ final recordingServiceProvider = Provider<RecordingService>((ref) {
   return service;
 });
 
+final patternServiceProvider = Provider<PatternService>((ref) => PatternService());
+
+final historyServiceProvider = Provider<HistoryService>((ref) => HistoryService());
+
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
   return SequencerNotifier(audioService);
@@ -37,12 +46,14 @@ final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerStat
 
 class SequencerNotifier extends StateNotifier<SequencerState> {
   final AudioService _audioService;
+  final HistoryService _history = HistoryService();
 
   SequencerNotifier(this._audioService) : super(_initialState()) {
     _audioService.updateTracks(state.tracks);
     _audioService.stepStream.listen((step) {
       state = state.copyWith(currentStep: step);
     });
+    _history.pushState(state);
   }
 
   static SequencerState _initialState() {
@@ -90,6 +101,7 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     newTracks[trackIndex] = track.copyWith(steps: newSteps);
     state = state.copyWith(tracks: newTracks);
     _audioService.updateTracks(newTracks);
+    _history.pushState(state);
   }
 
   void togglePlay() {
@@ -105,6 +117,7 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
   void setBpm(int bpm) {
     _audioService.updateBpm(bpm);
     state = state.copyWith(bpm: bpm);
+    _history.pushState(state);
   }
 
   void toggleMute(int trackIndex) {
@@ -113,6 +126,7 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     newTracks[trackIndex] = track.copyWith(muted: !track.muted);
     state = state.copyWith(tracks: newTracks);
     _audioService.updateTracks(newTracks);
+    _history.pushState(state);
   }
 
   void setTrackVolume(int trackIndex, double volume) {
@@ -177,6 +191,7 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     }).toList();
     state = state.copyWith(tracks: newTracks);
     _audioService.updateTracks(newTracks);
+    _history.pushState(state);
   }
 
   void loadState(SequencerState newState) {
@@ -184,10 +199,54 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     _audioService.updateTracks(newState.tracks);
     _audioService.updateBpm(newState.bpm);
     _audioService.updateMasterVolume(newState.masterVolume);
+    _history.pushState(state);
   }
 
   void setRecordingState(bool isRecording, String? path) {
     state = state.copyWith(isRecording: isRecording, recordingPath: path);
+  }
+
+  void undo() {
+    final previousState = _history.undo();
+    if (previousState != null) {
+      state = previousState;
+      _audioService.updateTracks(state.tracks);
+      _audioService.updateBpm(state.bpm);
+    }
+  }
+
+  void redo() {
+    final nextState = _history.redo();
+    if (nextState != null) {
+      state = nextState;
+      _audioService.updateTracks(state.tracks);
+      _audioService.updateBpm(state.bpm);
+    }
+  }
+
+  bool get canUndo => _history.canUndo;
+  bool get canRedo => _history.canRedo;
+
+  void applyPreset(Preset preset) {
+    final newTracks = List<Track>.from(state.tracks);
+    for (int i = 0; i < newTracks.length && i < preset.steps.length; i++) {
+      newTracks[i] = newTracks[i].copyWith(steps: List<bool>.from(preset.steps[i]));
+    }
+    state = state.copyWith(tracks: newTracks, bpm: preset.bpm);
+    _audioService.updateTracks(newTracks);
+    _audioService.updateBpm(preset.bpm);
+    _history.pushState(state);
+  }
+
+  void applyPattern(Pattern pattern) {
+    final newTracks = List<Track>.from(state.tracks);
+    for (int i = 0; i < newTracks.length && i < pattern.steps.length; i++) {
+      newTracks[i] = newTracks[i].copyWith(steps: List<bool>.from(pattern.steps[i]));
+    }
+    state = state.copyWith(tracks: newTracks, bpm: pattern.bpm);
+    _audioService.updateTracks(newTracks);
+    _audioService.updateBpm(pattern.bpm);
+    _history.pushState(state);
   }
 }
 
@@ -201,6 +260,7 @@ class SequencerScreen extends ConsumerWidget {
     final projectService = ref.read(projectServiceProvider);
     final exportService = ref.read(exportServiceProvider);
     final recordingService = ref.read(recordingServiceProvider);
+    final patternService = ref.read(patternServiceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -212,6 +272,16 @@ class SequencerScreen extends ConsumerWidget {
           ),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.undo),
+            onPressed: notifier.canUndo ? () => notifier.undo() : null,
+            tooltip: 'Отменить',
+          ),
+          IconButton(
+            icon: const Icon(Icons.redo),
+            onPressed: notifier.canRedo ? () => notifier.redo() : null,
+            tooltip: 'Повторить',
+          ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: () => _showSaveDialog(context, ref, state),
@@ -226,6 +296,16 @@ class SequencerScreen extends ConsumerWidget {
             icon: const Icon(Icons.download),
             onPressed: () => _exportProject(context, exportService, state),
             tooltip: 'Экспорт',
+          ),
+          IconButton(
+            icon: const Icon(Icons.library_music),
+            onPressed: () => _showPresetDialog(context, ref, notifier),
+            tooltip: 'Пресеты',
+          ),
+          IconButton(
+            icon: const Icon(Icons.queue_music),
+            onPressed: () => _showPatternDialog(context, ref, patternService, notifier),
+            tooltip: 'Паттерны',
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -384,5 +464,101 @@ class SequencerScreen extends ConsumerWidget {
         ),
       );
     }
+  }
+
+  void _showPresetDialog(BuildContext context, WidgetRef ref, SequencerNotifier notifier) {
+    showDialog(
+      context: context,
+      builder: (context) => PresetDialog(
+        onSelect: (preset) {
+          notifier.applyPreset(preset);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Пресет "${preset.name}" применён')),
+          );
+        },
+      ),
+    );
+  }
+
+  void _showPatternDialog(BuildContext context, WidgetRef ref, PatternService patternService, SequencerNotifier notifier) async {
+    final patterns = await patternService.listPatterns();
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Паттерны'),
+        content: SizedBox(
+          width: double.maxFinite,
+          height: 400,
+          child: patterns.isEmpty
+              ? const Text('Нет сохранённых паттернов')
+              : ListView.builder(
+                  itemCount: patterns.length,
+                  itemBuilder: (context, index) {
+                    final pattern = patterns[index];
+                    return ListTile(
+                      title: Text(pattern.name),
+                      subtitle: Text('${pattern.bpm} BPM'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.play_arrow),
+                            onPressed: () {
+                              notifier.applyPattern(pattern);
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Паттерн "${pattern.name}" применён')),
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () async {
+                              await patternService.deletePattern(pattern.id);
+                              if (context.mounted) {
+                                Navigator.of(context).pop();
+                                _showPatternDialog(context, ref, patternService, notifier);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Закрыть'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              _showNewPatternDialog(context, ref, patternService, notifier);
+            },
+            child: const Text('Новый паттерн'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showNewPatternDialog(BuildContext context, WidgetRef ref, PatternService patternService, SequencerNotifier notifier) {
+    showDialog(
+      context: context,
+      builder: (context) => PatternDialog(
+        onSave: (pattern) async {
+          await patternService.savePattern(pattern);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Паттерн "${pattern.name}" сохранён')),
+            );
+          }
+        },
+      ),
+    );
   }
 }

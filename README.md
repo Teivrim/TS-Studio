@@ -19,6 +19,10 @@
 - **Сохранение проектов** — сохранение и загрузка проектов
 - **Экспорт WAV** — экспорт проекта в WAV файл
 - **Очистка** — сброс всех шагов
+- **Undo/Redo** — история изменений
+- **Пресеты** — готовые паттерны для быстрого старта
+- **Паттерны** — создание и сохранение собственных паттернов
+- **Визуализация волны** — отображение аудио волны
 
 ## Технологии
 
@@ -57,14 +61,21 @@ lib/
 │   ├── track_header.dart     # Заголовок трека
 │   ├── transport_controls.dart # Кнопки управления
 │   ├── effects_panel.dart    # Панель эффектов
-│   └── project_dialog.dart   # Диалог сохранения
+│   ├── project_dialog.dart   # Диалог сохранения
+│   ├── pattern_dialog.dart   # Диалог паттернов
+│   ├── preset_dialog.dart    # Диалог пресетов
+│   └── waveform_widget.dart  # Визуализация волны
 ├── models/
-│   └── track.dart            # Модели данных
+│   ├── track.dart            # Модели данных
+│   └── pattern.dart          # Модели паттернов
 ├── services/
 │   ├── audio_service.dart    # Аудио-сервис
 │   ├── project_service.dart  # Сервис проектов
 │   ├── export_service.dart   # Сервис экспорта
-│   └── recording_service.dart # Сервис записи
+│   ├── recording_service.dart # Сервис записи
+│   ├── pattern_service.dart  # Сервис паттернов
+│   ├── preset_service.dart   # Сервис пресетов
+│   └── history_service.dart  # Сервис истории
 └── theme/
     └── app_theme.dart        # Тема приложения
 ```
