@@ -23,6 +23,10 @@
 - **Пресеты** — готовые паттерны для быстрого старта
 - **Паттерны** — создание и сохранение собственных паттернов
 - **Визуализация волны** — отображение аудио волны
+- **Микшер** — полноценный микшер с каналами
+- **Рандомайзер** — генерация случайных паттернов
+- **LFO** — модуляция параметров
+- **Параметрический фильтр** — срез и резонанс
 
 ## Технологии
 
@@ -64,10 +68,13 @@ lib/
 │   ├── project_dialog.dart   # Диалог сохранения
 │   ├── pattern_dialog.dart   # Диалог паттернов
 │   ├── preset_dialog.dart    # Диалог пресетов
+│   ├── mixer_screen.dart     # Экран микшера
+│   ├── randomizer_dialog.dart # Диалог рандомайзера
 │   └── waveform_widget.dart  # Визуализация волны
 ├── models/
 │   ├── track.dart            # Модели данных
-│   └── pattern.dart          # Модели паттернов
+│   ├── pattern.dart          # Модели паттернов
+│   └── mixer_channel.dart    # Модели микшера
 ├── services/
 │   ├── audio_service.dart    # Аудио-сервис
 │   ├── project_service.dart  # Сервис проектов
@@ -75,7 +82,9 @@ lib/
 │   ├── recording_service.dart # Сервис записи
 │   ├── pattern_service.dart  # Сервис паттернов
 │   ├── preset_service.dart   # Сервис пресетов
-│   └── history_service.dart  # Сервис истории
+│   ├── history_service.dart  # Сервис истории
+│   ├── mixer_service.dart    # Сервис микшера
+│   └── randomizer_service.dart # Сервис рандомайзера
 └── theme/
     └── app_theme.dart        # Тема приложения
 ```

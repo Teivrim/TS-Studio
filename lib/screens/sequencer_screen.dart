@@ -8,6 +8,8 @@ import '../services/export_service.dart';
 import '../services/recording_service.dart';
 import '../services/pattern_service.dart';
 import '../services/history_service.dart';
+import '../services/mixer_service.dart';
+import '../services/randomizer_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/step_sequencer.dart';
 import '../widgets/transport_controls.dart';
@@ -15,6 +17,8 @@ import '../widgets/effects_panel.dart';
 import '../widgets/project_dialog.dart';
 import '../widgets/pattern_dialog.dart';
 import '../widgets/preset_dialog.dart';
+import '../widgets/mixer_screen.dart';
+import '../widgets/randomizer_dialog.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -38,6 +42,10 @@ final recordingServiceProvider = Provider<RecordingService>((ref) {
 final patternServiceProvider = Provider<PatternService>((ref) => PatternService());
 
 final historyServiceProvider = Provider<HistoryService>((ref) => HistoryService());
+
+final mixerServiceProvider = Provider<MixerService>((ref) => MixerService());
+
+final randomizerServiceProvider = Provider<RandomizerService>((ref) => RandomizerService());
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -248,6 +256,14 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
     _audioService.updateBpm(pattern.bpm);
     _history.pushState(state);
   }
+
+  void applyRandomPattern(List<Track> newTracks) {
+    state = state.copyWith(tracks: newTracks);
+    _audioService.updateTracks(newTracks);
+    _history.pushState(state);
+  }
+
+  List<Track> getTracks() => state.tracks;
 }
 
 class SequencerScreen extends ConsumerWidget {
@@ -261,6 +277,8 @@ class SequencerScreen extends ConsumerWidget {
     final exportService = ref.read(exportServiceProvider);
     final recordingService = ref.read(recordingServiceProvider);
     final patternService = ref.read(patternServiceProvider);
+    final mixerService = ref.read(mixerServiceProvider);
+    final randomizerService = ref.read(randomizerServiceProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -306,6 +324,16 @@ class SequencerScreen extends ConsumerWidget {
             icon: const Icon(Icons.queue_music),
             onPressed: () => _showPatternDialog(context, ref, patternService, notifier),
             tooltip: 'Паттерны',
+          ),
+          IconButton(
+            icon: const Icon(Icons.shuffle),
+            onPressed: () => _showRandomizerDialog(context, ref, randomizerService, notifier),
+            tooltip: 'Рандомайзер',
+          ),
+          IconButton(
+            icon: const Icon(Icons.tune),
+            onPressed: () => _openMixer(context, ref, mixerService, state),
+            tooltip: 'Микшер',
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -361,6 +389,28 @@ class SequencerScreen extends ConsumerWidget {
             onFilterCutoffChanged: (v) => notifier.setFilterCutoff(v),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openMixer(BuildContext context, WidgetRef ref, MixerService mixerService, SequencerState state) {
+    mixerService.initializeChannels(state.tracks);
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MixerScreen(
+          channels: mixerService.channels,
+          onVolumeChanged: (id, v) => mixerService.setVolume(id, v),
+          onPanChanged: (id, p) => mixerService.setPan(id, p),
+          onMuteToggle: (id) => () => mixerService.toggleMute(id),
+          onSoloToggle: (id) => () => mixerService.toggleSolo(id),
+          onEqChanged: (id, l, m, h) => mixerService.setEq(id, low: l, mid: m, high: h),
+          onReverbSendChanged: (id, s) => mixerService.setReverbSend(id, s),
+          onDelaySendChanged: (id, s) => mixerService.setDelaySend(id, s),
+          onDistortionChanged: (id, v) => mixerService.setDistortion(id, v),
+          onChorusChanged: (id, v) => mixerService.setChorus(id, v),
+          onFilterChanged: (id, c, r) => mixerService.setFilter(id, cutoff: c, resonance: r),
+          onLfoChanged: (id, r, d, t) => mixerService.setLfo(id, rate: r, depth: d, target: t),
+        ),
       ),
     );
   }
@@ -557,6 +607,59 @@ class SequencerScreen extends ConsumerWidget {
               SnackBar(content: Text('Паттерн "${pattern.name}" сохранён')),
             );
           }
+        },
+      ),
+    );
+  }
+
+  void _showRandomizerDialog(BuildContext context, WidgetRef ref, RandomizerService randomizerService, SequencerNotifier notifier) {
+    final tracks = notifier.getTracks();
+    showDialog(
+      context: context,
+      builder: (context) => RandomizerDialog(
+        onRandomPattern: () {
+          final newTracks = randomizerService.generateRandomPattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onRandomKick: () {
+          final newTracks = randomizerService.generateKickPattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onRandomSnare: () {
+          final newTracks = randomizerService.generateSnarePattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onRandomHiHat: () {
+          final newTracks = randomizerService.generateHiHatPattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onRandomBass: () {
+          final newTracks = randomizerService.generateBassPattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onRandomMelodic: () {
+          final newTracks = randomizerService.generateMelodicPattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onRandomFull: () {
+          final newTracks = randomizerService.generateFullPattern(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onShuffle: () {
+          final newTracks = randomizerService.shuffleSteps(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onInvert: () {
+          final newTracks = randomizerService.invertSteps(tracks);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onShiftLeft: () {
+          final newTracks = randomizerService.shiftSteps(tracks, -1);
+          notifier.applyRandomPattern(newTracks);
+        },
+        onShiftRight: () {
+          final newTracks = randomizerService.shiftSteps(tracks, 1);
+          notifier.applyRandomPattern(newTracks);
         },
       ),
     );
