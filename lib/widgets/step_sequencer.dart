@@ -39,7 +39,7 @@ class StepSequencer extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       decoration: BoxDecoration(
                         color: isCurrentStep
-                            ? AppTheme.playheadColor.withOpacity(0.3)
+                            ? AppTheme.playheadColor.withValues(alpha: 0.3)
                             : Colors.transparent,
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -140,7 +140,7 @@ class _TrackRow extends StatelessWidget {
                         color: isActive
                             ? Color(track.color)
                             : isCurrentStep
-                                ? AppTheme.playheadColor.withOpacity(0.15)
+                                ? AppTheme.playheadColor.withValues(alpha: 0.15)
                                 : isBeat
                                     ? AppTheme.inactiveStepColor
                                     : AppTheme.gridColor,
@@ -157,7 +157,7 @@ class _TrackRow extends StatelessWidget {
                               child: Icon(
                                 Icons.circle,
                                 size: 8,
-                                color: Colors.white.withOpacity(0.5),
+                                color: Colors.white.withValues(alpha: 0.5),
                               ),
                             )
                           : null,

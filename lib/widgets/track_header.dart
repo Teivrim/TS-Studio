@@ -75,7 +75,7 @@ class TrackHeader extends StatelessWidget {
               padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
                 color: track.muted
-                    ? Colors.red.withOpacity(0.2)
+                    ? Colors.red.withValues(alpha: 0.2)
                     : Colors.transparent,
                 borderRadius: BorderRadius.circular(4),
               ),
