@@ -12,20 +12,18 @@ import '../services/history_service.dart';
 import '../services/mixer_service.dart';
 import '../services/randomizer_service.dart';
 import '../services/metronome_service.dart';
-import '../services/platform_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/step_sequencer.dart';
-import '../widgets/transport_controls.dart';
-import '../widgets/effects_panel.dart';
+import '../widgets/fl_step_sequencer.dart';
+import '../widgets/fl_transport.dart';
+import '../widgets/fl_effects_panel.dart';
+import '../widgets/fl_metronome.dart';
+import '../widgets/fl_app_bar.dart';
 import '../widgets/project_dialog.dart';
 import '../widgets/pattern_dialog.dart';
 import '../widgets/preset_dialog.dart';
 import '../widgets/mixer_screen.dart';
 import '../widgets/randomizer_dialog.dart';
-import '../widgets/metronome_widget.dart';
 import '../widgets/tap_tempo_button.dart';
-import '../widgets/hotkey_help_dialog.dart';
-import '../widgets/platform_indicator.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -301,61 +299,37 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     final notifier = ref.read(sequencerProvider.notifier);
     final state = ref.read(sequencerProvider);
 
-    // Space - Play/Pause
     if (event.logicalKey == LogicalKeyboardKey.space) {
       notifier.togglePlay();
-    }
-    // Ctrl+Z - Undo
-    else if (event.logicalKey == LogicalKeyboardKey.keyZ && HardwareKeyboard.instance.isControlPressed) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyZ && HardwareKeyboard.instance.isControlPressed) {
       notifier.undo();
-    }
-    // Ctrl+Y - Redo
-    else if (event.logicalKey == LogicalKeyboardKey.keyY && HardwareKeyboard.instance.isControlPressed) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyY && HardwareKeyboard.instance.isControlPressed) {
       notifier.redo();
-    }
-    // Ctrl+S - Save
-    else if (event.logicalKey == LogicalKeyboardKey.keyS && HardwareKeyboard.instance.isControlPressed) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyS && HardwareKeyboard.instance.isControlPressed) {
       _showSaveDialog(context, ref, state);
-    }
-    // Ctrl+O - Load
-    else if (event.logicalKey == LogicalKeyboardKey.keyO && HardwareKeyboard.instance.isControlPressed) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyO && HardwareKeyboard.instance.isControlPressed) {
       _showLoadDialog(context, ref, ref.read(projectServiceProvider), notifier);
-    }
-    // Ctrl+E - Export
-    else if (event.logicalKey == LogicalKeyboardKey.keyE && HardwareKeyboard.instance.isControlPressed) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyE && HardwareKeyboard.instance.isControlPressed) {
       _exportProject(context, ref.read(exportServiceProvider), state);
-    }
-    // M - Metronome
-    else if (event.logicalKey == LogicalKeyboardKey.keyM) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyM) {
       _toggleMetronome(ref);
-    }
-    // C - Clear
-    else if (event.logicalKey == LogicalKeyboardKey.keyC) {
+    } else if (event.logicalKey == LogicalKeyboardKey.keyC) {
       notifier.clearAll();
-    }
-    // 1-8 - Mute track
-    else if (event.logicalKey == LogicalKeyboardKey.digit1) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit1) {
       notifier.toggleMute(0);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit2) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit2) {
       notifier.toggleMute(1);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit3) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit3) {
       notifier.toggleMute(2);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit4) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit4) {
       notifier.toggleMute(3);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit5) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit5) {
       notifier.toggleMute(4);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit6) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit6) {
       notifier.toggleMute(5);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit7) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit7) {
       notifier.toggleMute(6);
-    }
-    else if (event.logicalKey == LogicalKeyboardKey.digit8) {
+    } else if (event.logicalKey == LogicalKeyboardKey.digit8) {
       notifier.toggleMute(7);
     }
   }
@@ -383,86 +357,24 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
       autofocus: true,
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'TS Studio',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: AppTheme.accentColor,
-                ),
-              ),
-              const SizedBox(width: 8),
-              const PlatformIndicator(),
-            ],
-          ),
-          actions: [
-            if (PlatformService.supportsHotkeys)
-              IconButton(
-                icon: const Icon(Icons.keyboard),
-                onPressed: () => showDialog(
-                  context: context,
-                  builder: (context) => const HotkeyHelpDialog(),
-                ),
-                tooltip: 'Горячие клавиши',
-              ),
-            IconButton(
-              icon: const Icon(Icons.undo),
-              onPressed: notifier.canUndo ? () => notifier.undo() : null,
-              tooltip: 'Отменить',
-            ),
-            IconButton(
-              icon: const Icon(Icons.redo),
-              onPressed: notifier.canRedo ? () => notifier.redo() : null,
-              tooltip: 'Повторить',
-            ),
-            IconButton(
-              icon: const Icon(Icons.save),
-              onPressed: () => _showSaveDialog(context, ref, state),
-              tooltip: 'Сохранить',
-            ),
-            IconButton(
-              icon: const Icon(Icons.folder_open),
-              onPressed: () => _showLoadDialog(context, ref, projectService, notifier),
-              tooltip: 'Загрузить',
-            ),
-            IconButton(
-              icon: const Icon(Icons.download),
-              onPressed: () => _exportProject(context, exportService, state),
-              tooltip: 'Экспорт',
-            ),
-            IconButton(
-              icon: const Icon(Icons.library_music),
-              onPressed: () => _showPresetDialog(context, ref, notifier),
-              tooltip: 'Пресеты',
-            ),
-            IconButton(
-              icon: const Icon(Icons.queue_music),
-              onPressed: () => _showPatternDialog(context, ref, patternService, notifier),
-              tooltip: 'Паттерны',
-            ),
-            IconButton(
-              icon: const Icon(Icons.shuffle),
-              onPressed: () => _showRandomizerDialog(context, ref, randomizerService, notifier),
-              tooltip: 'Рандомайзер',
-            ),
-            IconButton(
-              icon: const Icon(Icons.tune),
-              onPressed: () => _openMixer(context, ref, mixerService, state),
-              tooltip: 'Микшер',
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete_outline),
-              onPressed: () => notifier.clearAll(),
-              tooltip: 'Очистить',
-            ),
-          ],
+        backgroundColor: AppTheme.backgroundColor,
+        appBar: FLAppBar(
+          onSave: () => _showSaveDialog(context, ref, state),
+          onLoad: () => _showLoadDialog(context, ref, projectService, notifier),
+          onExport: () => _exportProject(context, exportService, state),
+          onPresets: () => _showPresetDialog(context, ref, notifier),
+          onPatterns: () => _showPatternDialog(context, ref, patternService, notifier),
+          onRandomizer: () => _showRandomizerDialog(context, ref, randomizerService, notifier),
+          onMixer: () => _openMixer(context, ref, mixerService, state),
+          onClear: () => notifier.clearAll(),
+          onUndo: () => notifier.undo(),
+          onRedo: () => notifier.redo(),
+          canUndo: notifier.canUndo,
+          canRedo: notifier.canRedo,
         ),
         body: Column(
           children: [
-            TransportControls(
+            FLTransport(
               isPlaying: state.isPlaying,
               bpm: state.bpm,
               onPlayPause: () => notifier.togglePlay(),
@@ -471,7 +383,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               isRecording: state.isRecording,
               onRecordToggle: () => _toggleRecording(context, ref, recordingService, notifier),
             ),
-            MetronomeWidget(
+            FLMetronome(
               currentBeat: metronomeService.currentBeat,
               isPlaying: metronomeService.isPlaying,
               onToggle: () => _toggleMetronome(ref),
@@ -480,7 +392,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
                 children: [
-                  const Text('BPM:', style: TextStyle(fontSize: 12, color: Colors.white54)),
+                  const Text('BPM:', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, letterSpacing: 1)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Slider(
@@ -493,8 +405,11 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                       onChanged: (value) => notifier.setBpm(value.round()),
                     ),
                   ),
-                  SizedBox(
-                    width: 50,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: AppTheme.flButtonDecoration(
+                      color: AppTheme.buttonColor,
+                    ),
                     child: Text(
                       '${state.bpm}',
                       style: const TextStyle(
@@ -512,7 +427,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               ),
             ),
             Expanded(
-              child: StepSequencer(
+              child: FLStepSequencer(
                 tracks: state.tracks,
                 currentStep: state.currentStep,
                 onStepToggle: (trackIndex, stepIndex) =>
@@ -520,11 +435,9 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                 onTrackMute: (trackIndex) => notifier.toggleMute(trackIndex),
                 onTrackVolume: (trackIndex, volume) =>
                     notifier.setTrackVolume(trackIndex, volume),
-                onTrackPan: (trackIndex, pan) =>
-                    notifier.setTrackPan(trackIndex, pan),
               ),
             ),
-            EffectsPanel(
+            FLEffectsPanel(
               masterVolume: state.masterVolume,
               reverbMix: state.reverbMix,
               delayMix: state.delayMix,
