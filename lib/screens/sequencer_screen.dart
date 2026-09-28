@@ -12,6 +12,8 @@ import '../services/history_service.dart';
 import '../services/mixer_service.dart';
 import '../services/randomizer_service.dart';
 import '../services/metronome_service.dart';
+import '../services/sample_service.dart';
+import '../services/automation_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/fl_step_sequencer.dart';
 import '../widgets/fl_transport.dart';
@@ -23,6 +25,9 @@ import '../widgets/pattern_dialog.dart';
 import '../widgets/preset_dialog.dart';
 import '../widgets/mixer_screen.dart';
 import '../widgets/randomizer_dialog.dart';
+import '../widgets/sample_manager_screen.dart';
+import '../widgets/automation_screen.dart';
+import '../widgets/piano_roll_screen.dart';
 import '../widgets/tap_tempo_button.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
@@ -54,6 +59,14 @@ final randomizerServiceProvider = Provider<RandomizerService>((ref) => Randomize
 
 final metronomeServiceProvider = Provider<MetronomeService>((ref) {
   final service = MetronomeService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
+final sampleServiceProvider = Provider<SampleService>((ref) => SampleService());
+
+final automationServiceProvider = Provider<AutomationService>((ref) {
+  final service = AutomationService();
   ref.onDispose(() => service.dispose());
   return service;
 });
@@ -351,6 +364,8 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     final mixerService = ref.read(mixerServiceProvider);
     final randomizerService = ref.read(randomizerServiceProvider);
     final metronomeService = ref.watch(metronomeServiceProvider);
+    final sampleService = ref.read(sampleServiceProvider);
+    final automationService = ref.read(automationServiceProvider);
 
     return KeyboardListener(
       focusNode: _focusNode,
@@ -458,6 +473,55 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               onDistortionChanged: (v) => notifier.setDistortion(v),
               onChorusChanged: (v) => notifier.setChorus(v),
               onFilterCutoffChanged: (v) => notifier.setFilterCutoff(v),
+            ),
+          ],
+        ),
+        floatingActionButton: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FloatingActionButton(
+              heroTag: 'samples',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SampleManagerScreen(
+                    sampleService: sampleService,
+                    onSampleSelected: (sample) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Сэмпл "${sample.name}" выбран')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.primaryColor,
+              child: const Icon(Icons.library_music, color: Colors.black),
+            ),
+            const SizedBox(height: 8),
+            FloatingActionButton(
+              heroTag: 'automation',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AutomationScreen(
+                    automationService: automationService,
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.accentColor,
+              child: const Icon(Icons.trending_up, color: Colors.black),
+            ),
+            const SizedBox(height: 8),
+            FloatingActionButton(
+              heroTag: 'piano',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => PianoRollScreen(
+                    bpm: state.bpm,
+                    onBpmChanged: (bpm) => notifier.setBpm(bpm),
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.successColor,
+              child: const Icon(Icons.piano, color: Colors.black),
             ),
           ],
         ),

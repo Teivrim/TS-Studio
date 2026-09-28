@@ -18,6 +18,7 @@
 - **Запись с микрофона** — запись аудио в проект
 - **Сохранение проектов** — сохранение и загрузка проектов
 - **Экспорт WAV** — экспорт проекта в WAV файл
+- **Экспорт MIDI** — экспорт проекта в MIDI файл
 - **Очистка** — сброс всех шагов
 - **Undo/Redo** — история изменений
 - **Пресеты** — готовые паттерны для быстрого старта
@@ -32,6 +33,9 @@
 - **Tap Tempo** — установка BPM тапом
 - **Анимации** — плавные анимации шагов
 - **Кроссплатформенность** — Android, iOS, Web, Desktop
+- **Sample Manager** — управление сэмплами
+- **Piano Roll** — пиано-ролл для мелодий
+- **Automation** — автоматизация параметров
 
 ## Технологии
 
@@ -80,25 +84,30 @@ lib/
 ├── screens/
 │   └── sequencer_screen.dart # Главный экран с секвенсором
 ├── widgets/
-│   ├── step_sequencer.dart   # Виджет сетки секвенсора
-│   ├── track_header.dart     # Заголовок трека
-│   ├── transport_controls.dart # Кнопки управления
-│   ├── effects_panel.dart    # Панель эффектов
-│   ├── project_dialog.dart   # Диалог сохранения
-│   ├── pattern_dialog.dart   # Диалог паттернов
-│   ├── preset_dialog.dart    # Диалог пресетов
+│   ├── fl_step_sequencer.dart # Секвенсор в стиле FL Studio
+│   ├── fl_track_header.dart  # Заголовок трека
+│   ├── fl_transport.dart     # Транспортные кнопки
+│   ├── fl_effects_panel.dart # Панель эффектов
+│   ├── fl_metronome.dart     # Метроном
+│   ├── fl_app_bar.dart       # Верхняя панель
+│   ├── fl_button.dart        # Кнопка в стиле FL Studio
+│   ├── fl_step.dart          # Шаг в стиле FL Studio
+│   ├── fl_slider.dart        # Слайдер в стиле FL Studio
+│   ├── fl_panel.dart         # Панель в стиле FL Studio
 │   ├── mixer_screen.dart     # Экран микшера
 │   ├── randomizer_dialog.dart # Диалог рандомайзера
-│   ├── metronome_widget.dart # Виджет метронома
+│   ├── sample_manager_screen.dart # Менеджер сэмплов
+│   ├── automation_screen.dart # Экран автоматизации
+│   ├── piano_roll_screen.dart # Пиано-ролл
 │   ├── tap_tempo_button.dart # Кнопка тап-темпо
 │   ├── hotkey_help_dialog.dart # Справка по горячим клавишам
 │   ├── platform_indicator.dart # Индикатор платформы
-│   ├── animated_step.dart     # Анимированный шаг
 │   └── waveform_widget.dart  # Визуализация волны
 ├── models/
 │   ├── track.dart            # Модели данных
 │   ├── pattern.dart          # Модели паттернов
-│   └── mixer_channel.dart    # Модели микшера
+│   ├── mixer_channel.dart    # Модели микшера
+│   └── sample.dart           # Модели сэмплов
 ├── services/
 │   ├── audio_service.dart    # Аудио-сервис
 │   ├── project_service.dart  # Сервис проектов
@@ -110,6 +119,8 @@ lib/
 │   ├── mixer_service.dart    # Сервис микшера
 │   ├── randomizer_service.dart # Сервис рандомайзера
 │   ├── metronome_service.dart # Сервис метронома
+│   ├── sample_service.dart   # Сервис сэмплов
+│   ├── automation_service.dart # Сервис автоматизации
 │   ├── platform_service.dart # Сервис платформы
 │   └── performance_service.dart # Сервис производительности
 └── theme/
