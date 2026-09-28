@@ -36,6 +36,9 @@
 - **Sample Manager** — управление сэмплами
 - **Piano Roll** — пиано-ролл для мелодий
 - **Automation** — автоматизация параметров
+- **Project Browser** — браузер проектов
+- **Spectrum Visualizer** — визуализатор спектра
+- **Settings** — настройки приложения
 
 ## Технологии
 
@@ -84,47 +87,51 @@ lib/
 ├── screens/
 │   └── sequencer_screen.dart # Главный экран с секвенсором
 ├── widgets/
-│   ├── fl_step_sequencer.dart # Секвенсор в стиле FL Studio
-│   ├── fl_track_header.dart  # Заголовок трека
-│   ├── fl_transport.dart     # Транспортные кнопки
-│   ├── fl_effects_panel.dart # Панель эффектов
-│   ├── fl_metronome.dart     # Метроном
-│   ├── fl_app_bar.dart       # Верхняя панель
-│   ├── fl_button.dart        # Кнопка в стиле FL Studio
-│   ├── fl_step.dart          # Шаг в стиле FL Studio
-│   ├── fl_slider.dart        # Слайдер в стиле FL Studio
-│   ├── fl_panel.dart         # Панель в стиле FL Studio
-│   ├── mixer_screen.dart     # Экран микшера
-│   ├── randomizer_dialog.dart # Диалог рандомайзера
+│   ├── modern_step_sequencer.dart # Секвенсор
+│   ├── modern_track_header.dart  # Заголовок трека
+│   ├── modern_transport.dart     # Транспортные кнопки
+│   ├── modern_effects_panel.dart # Панель эффектов
+│   ├── modern_metronome.dart     # Метроном
+│   ├── modern_app_bar.dart       # Верхняя панель
+│   ├── modern_button.dart        # Кнопка
+│   ├── modern_step.dart          # Шаг
+│   ├── modern_slider.dart        # Слайдер
+│   ├── modern_panel.dart         # Панель
+│   ├── mixer_screen.dart         # Экран микшера
+│   ├── randomizer_dialog.dart    # Диалог рандомайзера
 │   ├── sample_manager_screen.dart # Менеджер сэмплов
-│   ├── automation_screen.dart # Экран автоматизации
-│   ├── piano_roll_screen.dart # Пиано-ролл
-│   ├── tap_tempo_button.dart # Кнопка тап-темпо
-│   ├── hotkey_help_dialog.dart # Справка по горячим клавишам
-│   ├── platform_indicator.dart # Индикатор платформы
-│   └── waveform_widget.dart  # Визуализация волны
+│   ├── automation_screen.dart    # Экран автоматизации
+│   ├── piano_roll_screen.dart    # Пиано-ролл
+│   ├── tap_tempo_button.dart     # Кнопка тап-темпо
+│   ├── project_browser_screen.dart # Браузер проектов
+│   ├── spectrum_visualizer.dart  # Визуализатор спектра
+│   ├── settings_screen.dart      # Настройки
+│   └── export_dialog.dart        # Диалог экспорта
 ├── models/
-│   ├── track.dart            # Модели данных
-│   ├── pattern.dart          # Модели паттернов
-│   ├── mixer_channel.dart    # Модели микшера
-│   └── sample.dart           # Модели сэмплов
+│   ├── track.dart                # Модели данных
+│   ├── pattern.dart              # Модели паттернов
+│   ├── mixer_channel.dart        # Модели микшера
+│   ├── sample.dart               # Модели сэмплов
+│   └── project.dart              # Модели проектов
 ├── services/
-│   ├── audio_service.dart    # Аудио-сервис
-│   ├── project_service.dart  # Сервис проектов
-│   ├── export_service.dart   # Сервис экспорта
-│   ├── recording_service.dart # Сервис записи
-│   ├── pattern_service.dart  # Сервис паттернов
-│   ├── preset_service.dart   # Сервис пресетов
-│   ├── history_service.dart  # Сервис истории
-│   ├── mixer_service.dart    # Сервис микшера
-│   ├── randomizer_service.dart # Сервис рандомайзера
-│   ├── metronome_service.dart # Сервис метронома
-│   ├── sample_service.dart   # Сервис сэмплов
-│   ├── automation_service.dart # Сервис автоматизации
-│   ├── platform_service.dart # Сервис платформы
-│   └── performance_service.dart # Сервис производительности
+│   ├── audio_service.dart        # Аудио-сервис
+│   ├── project_service.dart      # Сервис проектов
+│   ├── export_service.dart       # Сервис экспорта
+│   ├── recording_service.dart    # Сервис записи
+│   ├── pattern_service.dart      # Сервис паттернов
+│   ├── preset_service.dart       # Сервис пресетов
+│   ├── history_service.dart      # Сервис истории
+│   ├── mixer_service.dart        # Сервис микшера
+│   ├── randomizer_service.dart   # Сервис рандомайзера
+│   ├── metronome_service.dart    # Сервис метронома
+│   ├── sample_service.dart       # Сервис сэмплов
+│   ├── automation_service.dart   # Сервис автоматизации
+│   ├── project_browser_service.dart # Сервис браузера проектов
+│   ├── spectrum_service.dart     # Сервис спектра
+│   ├── settings_service.dart     # Сервис настроек
+│   └── performance_service.dart  # Сервис производительности
 └── theme/
-    └── app_theme.dart        # Тема приложения
+    └── app_theme.dart            # Тема приложения
 ```
 
 ## Планы
