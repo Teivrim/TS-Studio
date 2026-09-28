@@ -45,26 +45,16 @@ class TrackHeader extends StatelessWidget {
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Slider(
-                        value: track.volume,
-                        min: 0,
-                        max: 1,
-                        activeColor: AppTheme.primaryColor,
-                        inactiveColor: AppTheme.gridColor,
-                        onChanged: onVolumeChanged,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 40,
-                      child: Text(
-                        '${(track.volume * 100).round()}%',
-                        style: const TextStyle(fontSize: 8, color: Colors.white54),
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  height: 20,
+                  child: Slider(
+                    value: track.volume,
+                    min: 0,
+                    max: 1,
+                    activeColor: AppTheme.primaryColor,
+                    inactiveColor: AppTheme.gridColor,
+                    onChanged: onVolumeChanged,
+                  ),
                 ),
               ],
             ),
