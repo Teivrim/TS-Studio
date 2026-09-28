@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/track.dart';
 import '../models/pattern.dart';
@@ -10,6 +11,8 @@ import '../services/pattern_service.dart';
 import '../services/history_service.dart';
 import '../services/mixer_service.dart';
 import '../services/randomizer_service.dart';
+import '../services/metronome_service.dart';
+import '../services/platform_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/step_sequencer.dart';
 import '../widgets/transport_controls.dart';
@@ -19,6 +22,10 @@ import '../widgets/pattern_dialog.dart';
 import '../widgets/preset_dialog.dart';
 import '../widgets/mixer_screen.dart';
 import '../widgets/randomizer_dialog.dart';
+import '../widgets/metronome_widget.dart';
+import '../widgets/tap_tempo_button.dart';
+import '../widgets/hotkey_help_dialog.dart';
+import '../widgets/platform_indicator.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -46,6 +53,12 @@ final historyServiceProvider = Provider<HistoryService>((ref) => HistoryService(
 final mixerServiceProvider = Provider<MixerService>((ref) => MixerService());
 
 final randomizerServiceProvider = Provider<RandomizerService>((ref) => RandomizerService());
+
+final metronomeServiceProvider = Provider<MetronomeService>((ref) {
+  final service = MetronomeService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -266,11 +279,95 @@ class SequencerNotifier extends StateNotifier<SequencerState> {
   List<Track> getTracks() => state.tracks;
 }
 
-class SequencerScreen extends ConsumerWidget {
+class SequencerScreen extends ConsumerStatefulWidget {
   const SequencerScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SequencerScreen> createState() => _SequencerScreenState();
+}
+
+class _SequencerScreenState extends ConsumerState<SequencerScreen> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _handleKeyEvent(KeyEvent event) {
+    if (event is! KeyDownEvent) return;
+
+    final notifier = ref.read(sequencerProvider.notifier);
+    final state = ref.read(sequencerProvider);
+
+    // Space - Play/Pause
+    if (event.logicalKey == LogicalKeyboardKey.space) {
+      notifier.togglePlay();
+    }
+    // Ctrl+Z - Undo
+    else if (event.logicalKey == LogicalKeyboardKey.keyZ && HardwareKeyboard.instance.isControlPressed) {
+      notifier.undo();
+    }
+    // Ctrl+Y - Redo
+    else if (event.logicalKey == LogicalKeyboardKey.keyY && HardwareKeyboard.instance.isControlPressed) {
+      notifier.redo();
+    }
+    // Ctrl+S - Save
+    else if (event.logicalKey == LogicalKeyboardKey.keyS && HardwareKeyboard.instance.isControlPressed) {
+      _showSaveDialog(context, ref, state);
+    }
+    // Ctrl+O - Load
+    else if (event.logicalKey == LogicalKeyboardKey.keyO && HardwareKeyboard.instance.isControlPressed) {
+      _showLoadDialog(context, ref, ref.read(projectServiceProvider), notifier);
+    }
+    // Ctrl+E - Export
+    else if (event.logicalKey == LogicalKeyboardKey.keyE && HardwareKeyboard.instance.isControlPressed) {
+      _exportProject(context, ref.read(exportServiceProvider), state);
+    }
+    // M - Metronome
+    else if (event.logicalKey == LogicalKeyboardKey.keyM) {
+      _toggleMetronome(ref);
+    }
+    // C - Clear
+    else if (event.logicalKey == LogicalKeyboardKey.keyC) {
+      notifier.clearAll();
+    }
+    // 1-8 - Mute track
+    else if (event.logicalKey == LogicalKeyboardKey.digit1) {
+      notifier.toggleMute(0);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit2) {
+      notifier.toggleMute(1);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit3) {
+      notifier.toggleMute(2);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit4) {
+      notifier.toggleMute(3);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit5) {
+      notifier.toggleMute(4);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit6) {
+      notifier.toggleMute(5);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit7) {
+      notifier.toggleMute(6);
+    }
+    else if (event.logicalKey == LogicalKeyboardKey.digit8) {
+      notifier.toggleMute(7);
+    }
+  }
+
+  void _toggleMetronome(WidgetRef ref) {
+    final metronomeService = ref.read(metronomeServiceProvider);
+    final state = ref.read(sequencerProvider);
+    metronomeService.toggle(bpm: state.bpm);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final state = ref.watch(sequencerProvider);
     final notifier = ref.read(sequencerProvider.notifier);
     final projectService = ref.read(projectServiceProvider);
@@ -279,116 +376,178 @@ class SequencerScreen extends ConsumerWidget {
     final patternService = ref.read(patternServiceProvider);
     final mixerService = ref.read(mixerServiceProvider);
     final randomizerService = ref.read(randomizerServiceProvider);
+    final metronomeService = ref.watch(metronomeServiceProvider);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'TS Studio',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: AppTheme.accentColor,
+    return KeyboardListener(
+      focusNode: _focusNode,
+      autofocus: true,
+      onKeyEvent: _handleKeyEvent,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'TS Studio',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.accentColor,
+                ),
+              ),
+              const SizedBox(width: 8),
+              const PlatformIndicator(),
+            ],
           ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.undo),
-            onPressed: notifier.canUndo ? () => notifier.undo() : null,
-            tooltip: 'Отменить',
-          ),
-          IconButton(
-            icon: const Icon(Icons.redo),
-            onPressed: notifier.canRedo ? () => notifier.redo() : null,
-            tooltip: 'Повторить',
-          ),
-          IconButton(
-            icon: const Icon(Icons.save),
-            onPressed: () => _showSaveDialog(context, ref, state),
-            tooltip: 'Сохранить',
-          ),
-          IconButton(
-            icon: const Icon(Icons.folder_open),
-            onPressed: () => _showLoadDialog(context, ref, projectService, notifier),
-            tooltip: 'Загрузить',
-          ),
-          IconButton(
-            icon: const Icon(Icons.download),
-            onPressed: () => _exportProject(context, exportService, state),
-            tooltip: 'Экспорт',
-          ),
-          IconButton(
-            icon: const Icon(Icons.library_music),
-            onPressed: () => _showPresetDialog(context, ref, notifier),
-            tooltip: 'Пресеты',
-          ),
-          IconButton(
-            icon: const Icon(Icons.queue_music),
-            onPressed: () => _showPatternDialog(context, ref, patternService, notifier),
-            tooltip: 'Паттерны',
-          ),
-          IconButton(
-            icon: const Icon(Icons.shuffle),
-            onPressed: () => _showRandomizerDialog(context, ref, randomizerService, notifier),
-            tooltip: 'Рандомайзер',
-          ),
-          IconButton(
-            icon: const Icon(Icons.tune),
-            onPressed: () => _openMixer(context, ref, mixerService, state),
-            tooltip: 'Микшер',
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: () => notifier.clearAll(),
-            tooltip: 'Очистить',
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          TransportControls(
-            isPlaying: state.isPlaying,
-            bpm: state.bpm,
-            onPlayPause: () => notifier.togglePlay(),
-            onStop: () => notifier.stop(),
-            onBpmChanged: (bpm) => notifier.setBpm(bpm),
-            isRecording: state.isRecording,
-            onRecordToggle: () => _toggleRecording(context, ref, recordingService, notifier),
-          ),
-          Expanded(
-            child: StepSequencer(
-              tracks: state.tracks,
-              currentStep: state.currentStep,
-              onStepToggle: (trackIndex, stepIndex) =>
-                  notifier.toggleStep(trackIndex, stepIndex),
-              onTrackMute: (trackIndex) => notifier.toggleMute(trackIndex),
-              onTrackVolume: (trackIndex, volume) =>
-                  notifier.setTrackVolume(trackIndex, volume),
-              onTrackPan: (trackIndex, pan) =>
-                  notifier.setTrackPan(trackIndex, pan),
+          actions: [
+            if (PlatformService.supportsHotkeys)
+              IconButton(
+                icon: const Icon(Icons.keyboard),
+                onPressed: () => showDialog(
+                  context: context,
+                  builder: (context) => const HotkeyHelpDialog(),
+                ),
+                tooltip: 'Горячие клавиши',
+              ),
+            IconButton(
+              icon: const Icon(Icons.undo),
+              onPressed: notifier.canUndo ? () => notifier.undo() : null,
+              tooltip: 'Отменить',
             ),
-          ),
-          EffectsPanel(
-            masterVolume: state.masterVolume,
-            reverbMix: state.reverbMix,
-            delayMix: state.delayMix,
-            delayTime: state.delayTime,
-            eqLow: state.eqLow,
-            eqMid: state.eqMid,
-            eqHigh: state.eqHigh,
-            distortion: state.distortion,
-            chorus: state.chorus,
-            filterCutoff: state.filterCutoff,
-            onMasterVolumeChanged: (v) => notifier.setMasterVolume(v),
-            onReverbMixChanged: (v) => notifier.setReverbMix(v),
-            onDelayMixChanged: (v) => notifier.setDelayMix(v),
-            onDelayTimeChanged: (v) => notifier.setDelayTime(v),
-            onEqLowChanged: (v) => notifier.setEqLow(v),
-            onEqMidChanged: (v) => notifier.setEqMid(v),
-            onEqHighChanged: (v) => notifier.setEqHigh(v),
-            onDistortionChanged: (v) => notifier.setDistortion(v),
-            onChorusChanged: (v) => notifier.setChorus(v),
-            onFilterCutoffChanged: (v) => notifier.setFilterCutoff(v),
-          ),
-        ],
+            IconButton(
+              icon: const Icon(Icons.redo),
+              onPressed: notifier.canRedo ? () => notifier.redo() : null,
+              tooltip: 'Повторить',
+            ),
+            IconButton(
+              icon: const Icon(Icons.save),
+              onPressed: () => _showSaveDialog(context, ref, state),
+              tooltip: 'Сохранить',
+            ),
+            IconButton(
+              icon: const Icon(Icons.folder_open),
+              onPressed: () => _showLoadDialog(context, ref, projectService, notifier),
+              tooltip: 'Загрузить',
+            ),
+            IconButton(
+              icon: const Icon(Icons.download),
+              onPressed: () => _exportProject(context, exportService, state),
+              tooltip: 'Экспорт',
+            ),
+            IconButton(
+              icon: const Icon(Icons.library_music),
+              onPressed: () => _showPresetDialog(context, ref, notifier),
+              tooltip: 'Пресеты',
+            ),
+            IconButton(
+              icon: const Icon(Icons.queue_music),
+              onPressed: () => _showPatternDialog(context, ref, patternService, notifier),
+              tooltip: 'Паттерны',
+            ),
+            IconButton(
+              icon: const Icon(Icons.shuffle),
+              onPressed: () => _showRandomizerDialog(context, ref, randomizerService, notifier),
+              tooltip: 'Рандомайзер',
+            ),
+            IconButton(
+              icon: const Icon(Icons.tune),
+              onPressed: () => _openMixer(context, ref, mixerService, state),
+              tooltip: 'Микшер',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_outline),
+              onPressed: () => notifier.clearAll(),
+              tooltip: 'Очистить',
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            TransportControls(
+              isPlaying: state.isPlaying,
+              bpm: state.bpm,
+              onPlayPause: () => notifier.togglePlay(),
+              onStop: () => notifier.stop(),
+              onBpmChanged: (bpm) => notifier.setBpm(bpm),
+              isRecording: state.isRecording,
+              onRecordToggle: () => _toggleRecording(context, ref, recordingService, notifier),
+            ),
+            MetronomeWidget(
+              currentBeat: metronomeService.currentBeat,
+              isPlaying: metronomeService.isPlaying,
+              onToggle: () => _toggleMetronome(ref),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              child: Row(
+                children: [
+                  const Text('BPM:', style: TextStyle(fontSize: 12, color: Colors.white54)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Slider(
+                      value: state.bpm.toDouble(),
+                      min: 60,
+                      max: 200,
+                      divisions: 140,
+                      activeColor: AppTheme.primaryColor,
+                      inactiveColor: AppTheme.gridColor,
+                      onChanged: (value) => notifier.setBpm(value.round()),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 50,
+                    child: Text(
+                      '${state.bpm}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.accentColor,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  TapTempoButton(
+                    onBpmChanged: (bpm) => notifier.setBpm(bpm),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: StepSequencer(
+                tracks: state.tracks,
+                currentStep: state.currentStep,
+                onStepToggle: (trackIndex, stepIndex) =>
+                    notifier.toggleStep(trackIndex, stepIndex),
+                onTrackMute: (trackIndex) => notifier.toggleMute(trackIndex),
+                onTrackVolume: (trackIndex, volume) =>
+                    notifier.setTrackVolume(trackIndex, volume),
+                onTrackPan: (trackIndex, pan) =>
+                    notifier.setTrackPan(trackIndex, pan),
+              ),
+            ),
+            EffectsPanel(
+              masterVolume: state.masterVolume,
+              reverbMix: state.reverbMix,
+              delayMix: state.delayMix,
+              delayTime: state.delayTime,
+              eqLow: state.eqLow,
+              eqMid: state.eqMid,
+              eqHigh: state.eqHigh,
+              distortion: state.distortion,
+              chorus: state.chorus,
+              filterCutoff: state.filterCutoff,
+              onMasterVolumeChanged: (v) => notifier.setMasterVolume(v),
+              onReverbMixChanged: (v) => notifier.setReverbMix(v),
+              onDelayMixChanged: (v) => notifier.setDelayMix(v),
+              onDelayTimeChanged: (v) => notifier.setDelayTime(v),
+              onEqLowChanged: (v) => notifier.setEqLow(v),
+              onEqMidChanged: (v) => notifier.setEqMid(v),
+              onEqHighChanged: (v) => notifier.setEqHigh(v),
+              onDistortionChanged: (v) => notifier.setDistortion(v),
+              onChorusChanged: (v) => notifier.setChorus(v),
+              onFilterCutoffChanged: (v) => notifier.setFilterCutoff(v),
+            ),
+          ],
+        ),
       ),
     );
   }

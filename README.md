@@ -27,6 +27,11 @@
 - **Рандомайзер** — генерация случайных паттернов
 - **LFO** — модуляция параметров
 - **Параметрический фильтр** — срез и резонанс
+- **Горячие клавиши** — поддержка клавиатуры (Desktop/Web)
+- **Метроном** — визуальный метроном
+- **Tap Tempo** — установка BPM тапом
+- **Анимации** — плавные анимации шагов
+- **Кроссплатформенность** — Android, iOS, Web, Desktop
 
 ## Технологии
 
@@ -53,6 +58,20 @@ flutter pub get
 flutter run
 ```
 
+## Горячие клавиши (Desktop/Web)
+
+| Клавиша | Действие |
+|---------|----------|
+| Space | Play / Pause |
+| Ctrl + Z | Отменить |
+| Ctrl + Y | Повторить |
+| Ctrl + S | Сохранить |
+| Ctrl + O | Загрузить |
+| Ctrl + E | Экспорт |
+| M | Метроном |
+| C | Очистить |
+| 1-8 | Mute трек |
+
 ## Структура проекта
 
 ```
@@ -70,6 +89,11 @@ lib/
 │   ├── preset_dialog.dart    # Диалог пресетов
 │   ├── mixer_screen.dart     # Экран микшера
 │   ├── randomizer_dialog.dart # Диалог рандомайзера
+│   ├── metronome_widget.dart # Виджет метронома
+│   ├── tap_tempo_button.dart # Кнопка тап-темпо
+│   ├── hotkey_help_dialog.dart # Справка по горячим клавишам
+│   ├── platform_indicator.dart # Индикатор платформы
+│   ├── animated_step.dart     # Анимированный шаг
 │   └── waveform_widget.dart  # Визуализация волны
 ├── models/
 │   ├── track.dart            # Модели данных
@@ -84,7 +108,10 @@ lib/
 │   ├── preset_service.dart   # Сервис пресетов
 │   ├── history_service.dart  # Сервис истории
 │   ├── mixer_service.dart    # Сервис микшера
-│   └── randomizer_service.dart # Сервис рандомайзера
+│   ├── randomizer_service.dart # Сервис рандомайзера
+│   ├── metronome_service.dart # Сервис метронома
+│   ├── platform_service.dart # Сервис платформы
+│   └── performance_service.dart # Сервис производительности
 └── theme/
     └── app_theme.dart        # Тема приложения
 ```
