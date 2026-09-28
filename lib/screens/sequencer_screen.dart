@@ -17,6 +17,8 @@ import '../services/automation_service.dart';
 import '../services/project_browser_service.dart';
 import '../services/spectrum_service.dart';
 import '../services/settings_service.dart';
+import '../services/synth_service.dart';
+import '../services/midi_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/modern_step_sequencer.dart';
 import '../widgets/modern_transport.dart';
@@ -36,6 +38,8 @@ import '../widgets/project_browser_screen.dart';
 import '../widgets/spectrum_visualizer.dart';
 import '../widgets/settings_screen.dart';
 import '../widgets/export_dialog.dart';
+import '../widgets/synth_screen.dart';
+import '../widgets/midi_monitor_screen.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -87,6 +91,14 @@ final spectrumServiceProvider = Provider<SpectrumService>((ref) {
 });
 
 final settingsServiceProvider = Provider<SettingsService>((ref) => SettingsService());
+
+final synthServiceProvider = Provider<SynthService>((ref) => SynthService());
+
+final midiServiceProvider = Provider<MidiService>((ref) {
+  final service = MidiService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -385,6 +397,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     final projectBrowserService = ref.read(projectBrowserServiceProvider);
     final spectrumService = ref.watch(spectrumServiceProvider);
     final settingsService = ref.read(settingsServiceProvider);
+    final midiService = ref.read(midiServiceProvider);
 
     return KeyboardListener(
       focusNode: _focusNode,
@@ -422,7 +435,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               isPlaying: metronomeService.isPlaying,
               onToggle: () => _toggleMetronome(ref),
             ),
-            // Spectrum Visualizer
+            // BPM and Spectrum
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
@@ -536,6 +549,36 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
             ),
             const SizedBox(height: 12),
             FloatingActionButton(
+              heroTag: 'synth',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SynthScreen(
+                    onPresetSelected: (preset) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Пресет "${preset.name}" выбран')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.primaryColor,
+              child: const Icon(Icons.piano_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'midi',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MidiMonitorScreen(
+                    midiService: midiService,
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.accentColor,
+              child: const Icon(Icons.usb_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
               heroTag: 'samples',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -549,7 +592,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.primaryColor,
+              backgroundColor: AppTheme.successColor,
               child: const Icon(Icons.library_music_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
@@ -562,7 +605,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.accentColor,
+              backgroundColor: AppTheme.warningColor,
               child: const Icon(Icons.trending_up_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
@@ -576,8 +619,8 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.successColor,
-              child: const Icon(Icons.piano_rounded, color: Colors.white),
+              backgroundColor: AppTheme.dangerColor,
+              child: const Icon(Icons.music_note_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
             FloatingActionButton(
@@ -594,7 +637,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.warningColor,
+              backgroundColor: AppTheme.textSecondary,
               child: const Icon(Icons.settings_rounded, color: Colors.white),
             ),
           ],

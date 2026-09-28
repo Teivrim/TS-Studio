@@ -1,0 +1,73 @@
+import '../models/synth_preset.dart';
+
+class SynthService {
+  static List<SynthPreset> getPresets() {
+    return [
+      SynthPreset(
+        id: 'lead_1',
+        name: 'Bright Lead',
+        category: 'Lead',
+        oscillator1Freq: 440,
+        oscillator2Freq: 445,
+        filterCutoff: 4000,
+        filterResonance: 0.3,
+        attack: 0.01,
+        decay: 0.2,
+        sustain: 0.6,
+        release: 0.3,
+      ),
+      SynthPreset(
+        id: 'bass_1',
+        name: 'Deep Bass',
+        category: 'Bass',
+        oscillator1Freq: 55,
+        oscillator2Freq: 55,
+        filterCutoff: 500,
+        filterResonance: 0.7,
+        attack: 0.01,
+        decay: 0.4,
+        sustain: 0.8,
+        release: 0.2,
+      ),
+      SynthPreset(
+        id: 'pad_1',
+        name: 'Warm Pad',
+        category: 'Pad',
+        oscillator1Freq: 261.63,
+        oscillator2Freq: 262.63,
+        filterCutoff: 1500,
+        filterResonance: 0.2,
+        attack: 0.5,
+        decay: 0.5,
+        sustain: 0.9,
+        release: 1.0,
+      ),
+      SynthPreset(
+        id: 'pluck_1',
+        name: 'Pluck',
+        category: 'Pluck',
+        oscillator1Freq: 329.63,
+        oscillator2Freq: 330.63,
+        filterCutoff: 3000,
+        filterResonance: 0.5,
+        attack: 0.001,
+        decay: 0.3,
+        sustain: 0.1,
+        release: 0.2,
+      ),
+      SynthPreset(
+        id: 'keys_1',
+        name: 'Electric Piano',
+        category: 'Keys',
+        oscillator1Freq: 523.25,
+        oscillator2Freq: 524.25,
+        filterCutoff: 2500,
+        filterResonance: 0.4,
+        attack: 0.005,
+        decay: 0.5,
+        sustain: 0.4,
+        release: 0.4,
+      ),
+    ];
+  }
+}
