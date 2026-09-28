@@ -39,6 +39,9 @@
 - **Project Browser** — браузер проектов
 - **Spectrum Visualizer** — визуализатор спектра
 - **Settings** — настройки приложения
+- **Synthesizer** — синтезатор с пресетами
+- **MIDI Monitor** — MIDI монитор
+- **Waveform Display** — отображение волны
 
 ## Технологии
 
@@ -106,13 +109,17 @@ lib/
 │   ├── project_browser_screen.dart # Браузер проектов
 │   ├── spectrum_visualizer.dart  # Визуализатор спектра
 │   ├── settings_screen.dart      # Настройки
-│   └── export_dialog.dart        # Диалог экспорта
+│   ├── export_dialog.dart        # Диалог экспорта
+│   ├── synth_screen.dart         # Синтезатор
+│   ├── midi_monitor_screen.dart  # MIDI монитор
+│   └── waveform_display.dart     # Отображение волны
 ├── models/
 │   ├── track.dart                # Модели данных
 │   ├── pattern.dart              # Модели паттернов
 │   ├── mixer_channel.dart        # Модели микшера
 │   ├── sample.dart               # Модели сэмплов
-│   └── project.dart              # Модели проектов
+│   ├── project.dart              # Модели проектов
+│   └── synth_preset.dart         # Модели пресетов синтезатора
 ├── services/
 │   ├── audio_service.dart        # Аудио-сервис
 │   ├── project_service.dart      # Сервис проектов
@@ -129,6 +136,8 @@ lib/
 │   ├── project_browser_service.dart # Сервис браузера проектов
 │   ├── spectrum_service.dart     # Сервис спектра
 │   ├── settings_service.dart     # Сервис настроек
+│   ├── synth_service.dart        # Сервис синтезатора
+│   ├── midi_service.dart         # MIDI сервис
 │   └── performance_service.dart  # Сервис производительности
 └── theme/
     └── app_theme.dart            # Тема приложения
