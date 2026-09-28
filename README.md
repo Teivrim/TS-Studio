@@ -42,6 +42,10 @@
 - **Synthesizer** — синтезатор с пресетами
 - **MIDI Monitor** — MIDI монитор
 - **Waveform Display** — отображение волны
+- **Effect Browser** — браузер эффектов
+- **Realtime Spectrum** — спектр в реальном времени
+- **Chord Progressions** — аккордовые прогрессии
+- **Drum Pads** — драм-пэды
 
 ## Технологии
 
@@ -112,14 +116,19 @@ lib/
 │   ├── export_dialog.dart        # Диалог экспорта
 │   ├── synth_screen.dart         # Синтезатор
 │   ├── midi_monitor_screen.dart  # MIDI монитор
-│   └── waveform_display.dart     # Отображение волны
+│   ├── waveform_display.dart     # Отображение волны
+│   ├── effect_browser_screen.dart # Браузер эффектов
+│   ├── realtime_spectrum.dart    # Спектр в реальном времени
+│   ├── chord_progression_screen.dart # Аккордовые прогрессии
+│   └── drum_pad_screen.dart      # Драм-пэды
 ├── models/
 │   ├── track.dart                # Модели данных
 │   ├── pattern.dart              # Модели паттернов
 │   ├── mixer_channel.dart        # Модели микшера
 │   ├── sample.dart               # Модели сэмплов
 │   ├── project.dart              # Модели проектов
-│   └── synth_preset.dart         # Модели пресетов синтезатора
+│   ├── synth_preset.dart         # Модели пресетов синтезатора
+│   └── effect_preset.dart        # Модели пресетов эффектов
 ├── services/
 │   ├── audio_service.dart        # Аудио-сервис
 │   ├── project_service.dart      # Сервис проектов
@@ -138,6 +147,7 @@ lib/
 │   ├── settings_service.dart     # Сервис настроек
 │   ├── synth_service.dart        # Сервис синтезатора
 │   ├── midi_service.dart         # MIDI сервис
+│   ├── effect_service.dart       # Сервис эффектов
 │   └── performance_service.dart  # Сервис производительности
 └── theme/
     └── app_theme.dart            # Тема приложения

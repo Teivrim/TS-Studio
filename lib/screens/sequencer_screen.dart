@@ -19,6 +19,7 @@ import '../services/spectrum_service.dart';
 import '../services/settings_service.dart';
 import '../services/synth_service.dart';
 import '../services/midi_service.dart';
+import '../services/effect_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/modern_step_sequencer.dart';
 import '../widgets/modern_transport.dart';
@@ -35,11 +36,14 @@ import '../widgets/automation_screen.dart';
 import '../widgets/piano_roll_screen.dart';
 import '../widgets/tap_tempo_button.dart';
 import '../widgets/project_browser_screen.dart';
-import '../widgets/spectrum_visualizer.dart';
 import '../widgets/settings_screen.dart';
 import '../widgets/export_dialog.dart';
 import '../widgets/synth_screen.dart';
 import '../widgets/midi_monitor_screen.dart';
+import '../widgets/effect_browser_screen.dart';
+import '../widgets/realtime_spectrum.dart';
+import '../widgets/chord_progression_screen.dart';
+import '../widgets/drum_pad_screen.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -99,6 +103,8 @@ final midiServiceProvider = Provider<MidiService>((ref) {
   ref.onDispose(() => service.dispose());
   return service;
 });
+
+final effectServiceProvider = Provider<EffectService>((ref) => EffectService());
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -487,8 +493,8 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
               height: 60,
-              child: SpectrumVisualizer(
-                spectrum: spectrumService.spectrum,
+              child: RealtimeSpectrum(
+                spectrumService: spectrumService,
                 height: 60,
               ),
             ),
@@ -566,6 +572,57 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
             ),
             const SizedBox(height: 12),
             FloatingActionButton(
+              heroTag: 'effects',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => EffectBrowserScreen(
+                    onPresetSelected: (preset) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Эффект "${preset.name}" выбран')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.accentColor,
+              child: const Icon(Icons.tune_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'drums',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => DrumPadScreen(
+                    onPadHit: (padName) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Пэд "$padName" нажат')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.successColor,
+              child: const Icon(Icons.music_note_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'chords',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ChordProgressionScreen(
+                    onProgressionSelected: (progression) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Прогрессия: ${progression.join(' - ')}')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.warningColor,
+              child: const Icon(Icons.queue_music_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
               heroTag: 'midi',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -574,7 +631,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.accentColor,
+              backgroundColor: AppTheme.dangerColor,
               child: const Icon(Icons.usb_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
@@ -592,7 +649,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.successColor,
+              backgroundColor: AppTheme.textSecondary,
               child: const Icon(Icons.library_music_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
@@ -605,7 +662,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.warningColor,
+              backgroundColor: AppTheme.textMuted,
               child: const Icon(Icons.trending_up_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
@@ -619,8 +676,8 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.dangerColor,
-              child: const Icon(Icons.music_note_rounded, color: Colors.white),
+              backgroundColor: AppTheme.borderColor,
+              child: const Icon(Icons.piano_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
             FloatingActionButton(
