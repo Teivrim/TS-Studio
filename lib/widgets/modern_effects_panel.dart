@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import 'fl_panel.dart';
-import 'fl_slider.dart';
+import 'modern_panel.dart';
+import 'modern_slider.dart';
 
-class FLEffectsPanel extends StatelessWidget {
+class ModernEffectsPanel extends StatelessWidget {
   final double masterVolume;
   final double reverbMix;
   final double delayMix;
@@ -25,7 +25,7 @@ class FLEffectsPanel extends StatelessWidget {
   final ValueChanged<double> onChorusChanged;
   final ValueChanged<double> onFilterCutoffChanged;
 
-  const FLEffectsPanel({
+  const ModernEffectsPanel({
     super.key,
     required this.masterVolume,
     required this.reverbMix,
@@ -51,25 +51,34 @@ class FLEffectsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FLPanel(
+    return ModernPanel(
       title: 'EFFECTS',
+      borderRadius: 16,
       child: Column(
         children: [
           // Master Volume
-          FLSlider(
+          ModernSlider(
             label: 'MASTER',
             value: masterVolume,
             onChanged: onMasterVolumeChanged,
             activeColor: AppTheme.accentColor,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // EQ Section
-          const Text('EQUALIZER', style: TextStyle(fontSize: 9, color: AppTheme.textSecondary, letterSpacing: 1)),
-          const SizedBox(height: 4),
+          const Text(
+            'EQUALIZER',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textSecondary,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'LOW',
                   value: eqLow,
                   onChanged: onEqLowChanged,
@@ -77,7 +86,7 @@ class FLEffectsPanel extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'MID',
                   value: eqMid,
                   onChanged: onEqMidChanged,
@@ -85,7 +94,7 @@ class FLEffectsPanel extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'HIGH',
                   value: eqHigh,
                   onChanged: onEqHighChanged,
@@ -94,46 +103,62 @@ class FLEffectsPanel extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Reverb & Delay
-          const Text('REVERB & DELAY', style: TextStyle(fontSize: 9, color: AppTheme.textSecondary, letterSpacing: 1)),
-          const SizedBox(height: 4),
+          const Text(
+            'REVERB & DELAY',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textSecondary,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'REVERB',
                   value: reverbMix,
                   onChanged: onReverbMixChanged,
-                  activeColor: AppTheme.primaryColor,
+                  activeColor: AppTheme.secondaryColor,
                 ),
               ),
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'DELAY',
                   value: delayMix,
                   onChanged: onDelayMixChanged,
-                  activeColor: AppTheme.primaryColor,
+                  activeColor: AppTheme.secondaryColor,
                 ),
               ),
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'TIME',
                   value: delayTime,
                   onChanged: onDelayTimeChanged,
-                  activeColor: AppTheme.primaryColor,
+                  activeColor: AppTheme.secondaryColor,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Distortion, Chorus, Filter
-          const Text('DISTORTION & CHORUS', style: TextStyle(fontSize: 9, color: AppTheme.textSecondary, letterSpacing: 1)),
-          const SizedBox(height: 4),
+          const Text(
+            'DISTORTION & CHORUS',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textSecondary,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'DISTORT',
                   value: distortion,
                   onChanged: onDistortionChanged,
@@ -141,7 +166,7 @@ class FLEffectsPanel extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'CHORUS',
                   value: chorus,
                   onChanged: onChorusChanged,
@@ -149,7 +174,7 @@ class FLEffectsPanel extends StatelessWidget {
                 ),
               ),
               Expanded(
-                child: FLSlider(
+                child: ModernSlider(
                   label: 'FILTER',
                   value: filterCutoff,
                   onChanged: onFilterCutoffChanged,

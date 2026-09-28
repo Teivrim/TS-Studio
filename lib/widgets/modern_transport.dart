@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import 'fl_button.dart';
+import 'modern_button.dart';
 
-class FLTransport extends StatelessWidget {
+class ModernTransport extends StatelessWidget {
   final bool isPlaying;
   final int bpm;
   final VoidCallback onPlayPause;
@@ -11,7 +11,7 @@ class FLTransport extends StatelessWidget {
   final bool isRecording;
   final VoidCallback onRecordToggle;
 
-  const FLTransport({
+  const ModernTransport({
     super.key,
     required this.isPlaying,
     required this.bpm,
@@ -25,55 +25,60 @@ class FLTransport extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
         color: AppTheme.surfaceColor,
         border: Border(
-          bottom: BorderSide(color: AppTheme.borderColor, width: 1),
+          bottom: BorderSide(
+            color: AppTheme.borderColor.withValues(alpha: 0.3),
+          ),
         ),
       ),
       child: Row(
         children: [
           // Play button
-          FLButton(
-            icon: isPlaying ? Icons.pause : Icons.play_arrow,
+          ModernButton(
+            icon: isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
             color: isPlaying ? AppTheme.primaryColor : null,
             isPrimary: true,
             onPressed: onPlayPause,
-            width: 56,
-            height: 56,
+            width: 64,
+            height: 64,
+            borderRadius: 16,
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           // Stop button
-          FLButton(
-            icon: Icons.stop,
+          ModernButton(
+            icon: Icons.stop_rounded,
             onPressed: onStop,
-            width: 48,
-            height: 48,
+            width: 52,
+            height: 52,
+            borderRadius: 14,
           ),
           const SizedBox(width: 12),
           // Record button
-          FLButton(
+          ModernButton(
             icon: isRecording ? Icons.stop_circle : Icons.fiber_manual_record,
             color: isRecording ? AppTheme.dangerColor : null,
             isActive: isRecording,
             onPressed: onRecordToggle,
-            width: 48,
-            height: 48,
+            width: 52,
+            height: 52,
+            borderRadius: 14,
           ),
-          const SizedBox(width: 24),
+          const SizedBox(width: 32),
           // BPM control
           Expanded(
             child: Row(
               children: [
-                const Icon(Icons.speed, size: 20, color: AppTheme.textSecondary),
-                const SizedBox(width: 8),
+                const Icon(Icons.speed_rounded, size: 20, color: AppTheme.textSecondary),
+                const SizedBox(width: 12),
                 Expanded(
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       trackHeight: 4,
-                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
-                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
+                      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
+                      overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
                       activeTrackColor: AppTheme.primaryColor,
                       inactiveTrackColor: AppTheme.gridColor,
                       thumbColor: AppTheme.primaryColor,
@@ -88,16 +93,18 @@ class FLTransport extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: AppTheme.flButtonDecoration(
-                    color: AppTheme.buttonColor,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: AppTheme.modernButtonDecoration(
+                    color: AppTheme.surfaceLightColor,
+                    borderRadius: 12,
                   ),
                   child: Text(
                     '$bpm BPM',
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                       color: AppTheme.accentColor,
+                      letterSpacing: 0.5,
                     ),
                   ),
                 ),

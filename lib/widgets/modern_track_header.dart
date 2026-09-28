@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import '../models/track.dart';
 import '../theme/app_theme.dart';
 
-class FLTrackHeader extends StatelessWidget {
+class ModernTrackHeader extends StatelessWidget {
   final Track track;
   final VoidCallback onMute;
   final ValueChanged<double> onVolumeChanged;
 
-  const FLTrackHeader({
+  const ModernTrackHeader({
     super.key,
     required this.track,
     required this.onMute,
@@ -17,11 +17,15 @@ class FLTrackHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: track.muted ? AppTheme.gridColor.withValues(alpha: 0.5) : AppTheme.surfaceColor,
+        color: track.muted
+            ? AppTheme.surfaceColor.withValues(alpha: 0.5)
+            : AppTheme.surfaceColor,
         border: Border(
-          right: BorderSide(color: AppTheme.borderColor.withValues(alpha: 0.3)),
+          right: BorderSide(
+            color: AppTheme.borderColor.withValues(alpha: 0.2),
+          ),
         ),
       ),
       child: Column(
@@ -33,35 +37,41 @@ class FLTrackHeader extends StatelessWidget {
             children: [
               Container(
                 width: 4,
-                height: 32,
+                height: 36,
                 decoration: BoxDecoration(
                   color: Color(track.color),
                   borderRadius: BorderRadius.circular(2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(track.color).withValues(alpha: 0.4),
+                      blurRadius: 8,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Expanded(
                 child: Text(
                   track.name,
                   style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: track.muted ? AppTheme.textSecondary : AppTheme.textPrimary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: track.muted ? AppTheme.textMuted : AppTheme.textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           // Volume slider
           SizedBox(
-            height: 20,
+            height: 24,
             child: SliderTheme(
               data: SliderTheme.of(context).copyWith(
                 trackHeight: 3,
-                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 5),
-                overlayShape: const RoundSliderOverlayShape(overlayRadius: 10),
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
                 activeTrackColor: AppTheme.primaryColor,
                 inactiveTrackColor: AppTheme.gridColor,
                 thumbColor: AppTheme.primaryColor,
@@ -74,22 +84,26 @@ class FLTrackHeader extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 6),
           // Mute button
           GestureDetector(
             onTap: onMute,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: AppTheme.flButtonDecoration(
-                color: track.muted ? AppTheme.dangerColor.withValues(alpha: 0.3) : AppTheme.buttonColor,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: AppTheme.modernButtonDecoration(
+                color: track.muted
+                    ? AppTheme.dangerColor.withValues(alpha: 0.2)
+                    : AppTheme.surfaceLightColor,
                 isPrimary: track.muted,
+                borderRadius: 8,
               ),
               child: Text(
                 track.muted ? 'MUTED' : 'MUTE',
                 style: TextStyle(
                   fontSize: 9,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                   color: track.muted ? AppTheme.dangerColor : AppTheme.textSecondary,
+                  letterSpacing: 1,
                 ),
               ),
             ),

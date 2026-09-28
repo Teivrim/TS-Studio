@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/sample.dart';
 import '../services/sample_service.dart';
 import '../theme/app_theme.dart';
-import 'fl_button.dart';
+import 'modern_button.dart';
 
 class SampleManagerScreen extends StatefulWidget {
   final SampleService sampleService;
@@ -57,18 +57,18 @@ class _SampleManagerScreenState extends State<SampleManagerScreen> {
           'SAMPLE MANAGER',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
             letterSpacing: 2,
           ),
         ),
         backgroundColor: AppTheme.surfaceColor,
         actions: [
-          FLButton(
-            icon: Icons.refresh,
+          ModernButton(
+            icon: Icons.refresh_rounded,
             onPressed: _loadSamples,
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
           ),
         ],
       ),
@@ -76,27 +76,31 @@ class _SampleManagerScreenState extends State<SampleManagerScreen> {
         children: [
           // Category filter
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: _categories.map((category) {
                   final isSelected = category == _selectedCategory;
                   return Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: 12),
                     child: GestureDetector(
                       onTap: () => setState(() => _selectedCategory = category),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: AppTheme.flButtonDecoration(
-                          color: isSelected ? AppTheme.primaryColor.withValues(alpha: 0.3) : AppTheme.buttonColor,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        decoration: AppTheme.modernButtonDecoration(
+                          color: isSelected
+                              ? AppTheme.primaryColor.withValues(alpha: 0.2)
+                              : AppTheme.surfaceLightColor,
                           isPrimary: isSelected,
+                          borderRadius: 12,
                         ),
                         child: Text(
                           category,
                           style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
                             color: isSelected ? AppTheme.primaryColor : AppTheme.textSecondary,
                           ),
                         ),
@@ -156,47 +160,48 @@ class _SampleTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: AppTheme.flPanelDecoration(),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      decoration: AppTheme.modernPanelDecoration(),
       child: ListTile(
         leading: Container(
-          width: 40,
-          height: 40,
-          decoration: AppTheme.flButtonDecoration(
-            color: AppTheme.buttonColor,
+          width: 48,
+          height: 48,
+          decoration: AppTheme.modernButtonDecoration(
+            color: AppTheme.surfaceLightColor,
+            borderRadius: 12,
           ),
-          child: const Icon(Icons.audiotrack, color: AppTheme.primaryColor),
+          child: const Icon(Icons.audiotrack_rounded, color: AppTheme.primaryColor),
         ),
         title: Text(
           sample.name,
           style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
           ),
         ),
         subtitle: Text(
           '${sample.category} • ${sample.bpm} BPM',
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 12,
             color: AppTheme.textSecondary,
           ),
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FLButton(
-              icon: Icons.play_arrow,
+            ModernButton(
+              icon: Icons.play_arrow_rounded,
               onPressed: onTap,
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
             ),
-            const SizedBox(width: 4),
-            FLButton(
-              icon: Icons.delete,
+            const SizedBox(width: 8),
+            ModernButton(
+              icon: Icons.delete_outline_rounded,
               onPressed: onDelete,
-              width: 36,
-              height: 36,
+              width: 44,
+              height: 44,
             ),
           ],
         ),

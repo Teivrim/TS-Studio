@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import '../models/track.dart';
 import '../theme/app_theme.dart';
-import 'fl_step.dart';
-import 'fl_track_header.dart';
+import 'modern_step.dart';
+import 'modern_track_header.dart';
 
-class FLStepSequencer extends StatelessWidget {
+class ModernStepSequencer extends StatelessWidget {
   final List<Track> tracks;
   final int currentStep;
   final void Function(int trackIndex, int stepIndex) onStepToggle;
   final void Function(int trackIndex) onTrackMute;
   final void Function(int trackIndex, double volume) onTrackVolume;
 
-  const FLStepSequencer({
+  const ModernStepSequencer({
     super.key,
     required this.tracks,
     required this.currentStep,
@@ -23,17 +23,22 @@ class FLStepSequencer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: AppTheme.flPanelDecoration(),
+      decoration: AppTheme.modernPanelDecoration(borderRadius: 16),
       child: Column(
         children: [
           // Step numbers header
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: const BoxDecoration(
-              color: AppTheme.buttonColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(4),
-                topRight: Radius.circular(4),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceLightColor.withValues(alpha: 0.3),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.borderColor.withValues(alpha: 0.2),
+                ),
               ),
             ),
             child: Row(
@@ -44,10 +49,11 @@ class FLStepSequencer extends StatelessWidget {
                   final isBeat = index % 4 == 0;
                   return Expanded(
                     child: Center(
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        decoration: AppTheme.flLedDecoration(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 150),
+                        width: 24,
+                        height: 24,
+                        decoration: AppTheme.ledDecoration(
                           isOn: isCurrentStep,
                           color: isBeat ? AppTheme.primaryColor : AppTheme.accentColor,
                         ),
@@ -55,9 +61,9 @@ class FLStepSequencer extends StatelessWidget {
                           child: Text(
                             '${index + 1}',
                             style: TextStyle(
-                              fontSize: 8,
-                              fontWeight: FontWeight.bold,
-                              color: isCurrentStep ? Colors.black : AppTheme.textSecondary,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              color: isCurrentStep ? Colors.white : AppTheme.textMuted,
                             ),
                           ),
                         ),
@@ -75,11 +81,11 @@ class FLStepSequencer extends StatelessWidget {
               itemBuilder: (context, index) {
                 final track = tracks[index];
                 return Container(
-                  height: 64,
+                  height: 72,
                   decoration: BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
-                        color: AppTheme.borderColor.withValues(alpha: 0.3),
+                        color: AppTheme.borderColor.withValues(alpha: 0.15),
                       ),
                     ),
                   ),
@@ -87,7 +93,7 @@ class FLStepSequencer extends StatelessWidget {
                     children: [
                       SizedBox(
                         width: 120,
-                        child: FLTrackHeader(
+                        child: ModernTrackHeader(
                           track: track,
                           onMute: () => onTrackMute(index),
                           onVolumeChanged: (v) => onTrackVolume(index, v),
@@ -101,7 +107,7 @@ class FLStepSequencer extends StatelessWidget {
                             final isBeat = stepIndex % 4 == 0;
 
                             return Expanded(
-                              child: FLStep(
+                              child: ModernStep(
                                 isActive: isActive,
                                 isCurrentStep: isCurrentStep,
                                 isBeat: isBeat,

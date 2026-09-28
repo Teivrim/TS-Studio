@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-class FLButton extends StatefulWidget {
+class ModernButton extends StatefulWidget {
   final String? text;
   final IconData? icon;
   final VoidCallback? onPressed;
@@ -10,8 +10,9 @@ class FLButton extends StatefulWidget {
   final double width;
   final double height;
   final bool isActive;
+  final double borderRadius;
 
-  const FLButton({
+  const ModernButton({
     super.key,
     this.text,
     this.icon,
@@ -21,13 +22,14 @@ class FLButton extends StatefulWidget {
     this.width = 48,
     this.height = 48,
     this.isActive = false,
+    this.borderRadius = 12,
   });
 
   @override
-  State<FLButton> createState() => _FLButtonState();
+  State<ModernButton> createState() => _ModernButtonState();
 }
 
-class _FLButtonState extends State<FLButton> {
+class _ModernButtonState extends State<ModernButton> {
   bool _isPressed = false;
 
   @override
@@ -40,13 +42,14 @@ class _FLButtonState extends State<FLButton> {
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
+        duration: const Duration(milliseconds: 150),
         width: widget.width,
         height: widget.height,
-        decoration: AppTheme.flButtonDecoration(
+        decoration: AppTheme.modernButtonDecoration(
           color: widget.color,
           isPressed: _isPressed,
           isPrimary: widget.isPrimary,
+          borderRadius: widget.borderRadius,
         ),
         child: Center(
           child: widget.icon != null
@@ -55,15 +58,15 @@ class _FLButtonState extends State<FLButton> {
                   color: widget.isActive
                       ? AppTheme.accentColor
                       : widget.isPrimary
-                          ? AppTheme.primaryColor
+                          ? Colors.white
                           : AppTheme.textPrimary,
-                  size: widget.height * 0.5,
+                  size: widget.height * 0.45,
                 )
               : Text(
                   widget.text ?? '',
                   style: TextStyle(
-                    color: widget.isPrimary ? AppTheme.primaryColor : AppTheme.textPrimary,
-                    fontWeight: FontWeight.bold,
+                    color: widget.isPrimary ? Colors.white : AppTheme.textPrimary,
+                    fontWeight: FontWeight.w600,
                     fontSize: 12,
                   ),
                 ),

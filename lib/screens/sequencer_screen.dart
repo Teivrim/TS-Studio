@@ -15,11 +15,11 @@ import '../services/metronome_service.dart';
 import '../services/sample_service.dart';
 import '../services/automation_service.dart';
 import '../theme/app_theme.dart';
-import '../widgets/fl_step_sequencer.dart';
-import '../widgets/fl_transport.dart';
-import '../widgets/fl_effects_panel.dart';
-import '../widgets/fl_metronome.dart';
-import '../widgets/fl_app_bar.dart';
+import '../widgets/modern_step_sequencer.dart';
+import '../widgets/modern_transport.dart';
+import '../widgets/modern_effects_panel.dart';
+import '../widgets/modern_metronome.dart';
+import '../widgets/modern_app_bar.dart';
 import '../widgets/project_dialog.dart';
 import '../widgets/pattern_dialog.dart';
 import '../widgets/preset_dialog.dart';
@@ -373,7 +373,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
       onKeyEvent: _handleKeyEvent,
       child: Scaffold(
         backgroundColor: AppTheme.backgroundColor,
-        appBar: FLAppBar(
+        appBar: ModernAppBar(
           onSave: () => _showSaveDialog(context, ref, state),
           onLoad: () => _showLoadDialog(context, ref, projectService, notifier),
           onExport: () => _exportProject(context, exportService, state),
@@ -389,7 +389,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
         ),
         body: Column(
           children: [
-            FLTransport(
+            ModernTransport(
               isPlaying: state.isPlaying,
               bpm: state.bpm,
               onPlayPause: () => notifier.togglePlay(),
@@ -398,17 +398,25 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               isRecording: state.isRecording,
               onRecordToggle: () => _toggleRecording(context, ref, recordingService, notifier),
             ),
-            FLMetronome(
+            ModernMetronome(
               currentBeat: metronomeService.currentBeat,
               isPlaying: metronomeService.isPlaying,
               onToggle: () => _toggleMetronome(ref),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 children: [
-                  const Text('BPM:', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, letterSpacing: 1)),
-                  const SizedBox(width: 8),
+                  const Text(
+                    'BPM:',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: AppTheme.textSecondary,
+                      letterSpacing: 1,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: Slider(
                       value: state.bpm.toDouble(),
@@ -421,20 +429,21 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: AppTheme.flButtonDecoration(
-                      color: AppTheme.buttonColor,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: AppTheme.modernButtonDecoration(
+                      color: AppTheme.surfaceLightColor,
+                      borderRadius: 12,
                     ),
                     child: Text(
                       '${state.bpm}',
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
                         color: AppTheme.accentColor,
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 12),
                   TapTempoButton(
                     onBpmChanged: (bpm) => notifier.setBpm(bpm),
                   ),
@@ -442,7 +451,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               ),
             ),
             Expanded(
-              child: FLStepSequencer(
+              child: ModernStepSequencer(
                 tracks: state.tracks,
                 currentStep: state.currentStep,
                 onStepToggle: (trackIndex, stepIndex) =>
@@ -452,7 +461,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                     notifier.setTrackVolume(trackIndex, volume),
               ),
             ),
-            FLEffectsPanel(
+            ModernEffectsPanel(
               masterVolume: state.masterVolume,
               reverbMix: state.reverbMix,
               delayMix: state.delayMix,
@@ -494,9 +503,9 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                 ),
               ),
               backgroundColor: AppTheme.primaryColor,
-              child: const Icon(Icons.library_music, color: Colors.black),
+              child: const Icon(Icons.library_music_rounded, color: Colors.white),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             FloatingActionButton(
               heroTag: 'automation',
               onPressed: () => Navigator.of(context).push(
@@ -507,9 +516,9 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                 ),
               ),
               backgroundColor: AppTheme.accentColor,
-              child: const Icon(Icons.trending_up, color: Colors.black),
+              child: const Icon(Icons.trending_up_rounded, color: Colors.white),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             FloatingActionButton(
               heroTag: 'piano',
               onPressed: () => Navigator.of(context).push(
@@ -521,7 +530,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                 ),
               ),
               backgroundColor: AppTheme.successColor,
-              child: const Icon(Icons.piano, color: Colors.black),
+              child: const Icon(Icons.piano_rounded, color: Colors.white),
             ),
           ],
         ),
@@ -690,7 +699,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           IconButton(
-                            icon: const Icon(Icons.play_arrow),
+                            icon: const Icon(Icons.play_arrow_rounded),
                             onPressed: () {
                               notifier.applyPattern(pattern);
                               Navigator.of(context).pop();
@@ -700,7 +709,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                             },
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete),
+                            icon: const Icon(Icons.delete_outline_rounded),
                             onPressed: () async {
                               await patternService.deletePattern(pattern.id);
                               if (context.mounted) {

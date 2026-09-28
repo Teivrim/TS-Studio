@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-class FLStep extends StatefulWidget {
+class ModernStep extends StatefulWidget {
   final bool isActive;
   final bool isCurrentStep;
   final bool isBeat;
   final Color? activeColor;
   final VoidCallback onTap;
 
-  const FLStep({
+  const ModernStep({
     super.key,
     required this.isActive,
     required this.isCurrentStep,
@@ -18,10 +18,10 @@ class FLStep extends StatefulWidget {
   });
 
   @override
-  State<FLStep> createState() => _FLStepState();
+  State<ModernStep> createState() => _ModernStepState();
 }
 
-class _FLStepState extends State<FLStep> with SingleTickerProviderStateMixin {
+class _ModernStepState extends State<ModernStep> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -29,16 +29,16 @@ class _FLStepState extends State<FLStep> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
+      duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.92).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
   }
 
   @override
-  void didUpdateWidget(FLStep oldWidget) {
+  void didUpdateWidget(ModernStep oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.isActive && !oldWidget.isActive) {
       _controller.forward();
@@ -67,9 +67,10 @@ class _FLStepState extends State<FLStep> with SingleTickerProviderStateMixin {
         builder: (context, child) {
           return Transform.scale(
             scale: _scaleAnimation.value,
-            child: Container(
-              margin: const EdgeInsets.all(2),
-              decoration: AppTheme.flStepDecoration(
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              margin: const EdgeInsets.all(3),
+              decoration: AppTheme.modernStepDecoration(
                 isActive: widget.isActive,
                 isCurrentStep: widget.isCurrentStep,
                 isBeat: widget.isBeat,
@@ -78,11 +79,17 @@ class _FLStepState extends State<FLStep> with SingleTickerProviderStateMixin {
               child: widget.isActive
                   ? Center(
                       child: Container(
-                        width: 6,
-                        height: 6,
+                        width: 8,
+                        height: 8,
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.8),
+                          color: Colors.white.withValues(alpha: 0.9),
                           shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              blurRadius: 8,
+                            ),
+                          ],
                         ),
                       ),
                     )

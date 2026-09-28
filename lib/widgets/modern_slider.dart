@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-class FLSlider extends StatelessWidget {
+class ModernSlider extends StatelessWidget {
   final double value;
-  final ValueChanged<double> onChanged;
+  final ValueChanged<double>? onChanged;
   final Color? activeColor;
   final double height;
   final String? label;
 
-  const FLSlider({
+  const ModernSlider({
     super.key,
     required this.value,
-    required this.onChanged,
+    this.onChanged,
     this.activeColor,
-    this.height = 24,
+    this.height = 32,
     this.label,
   });
 
@@ -25,11 +25,16 @@ class FLSlider extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         if (label != null)
-          Text(
-            label!,
-            style: const TextStyle(
-              fontSize: 9,
-              color: AppTheme.textSecondary,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Text(
+              label!,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.textSecondary,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
         SizedBox(
@@ -37,11 +42,12 @@ class FLSlider extends StatelessWidget {
           child: SliderTheme(
             data: SliderTheme.of(context).copyWith(
               trackHeight: 4,
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+              overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
               activeTrackColor: color,
               inactiveTrackColor: AppTheme.gridColor,
               thumbColor: color,
+              trackShape: const RectangularSliderTrackShape(),
             ),
             child: Slider(
               value: value,
