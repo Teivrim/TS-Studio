@@ -14,6 +14,9 @@ import '../services/randomizer_service.dart';
 import '../services/metronome_service.dart';
 import '../services/sample_service.dart';
 import '../services/automation_service.dart';
+import '../services/project_browser_service.dart';
+import '../services/spectrum_service.dart';
+import '../services/settings_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/modern_step_sequencer.dart';
 import '../widgets/modern_transport.dart';
@@ -29,6 +32,10 @@ import '../widgets/sample_manager_screen.dart';
 import '../widgets/automation_screen.dart';
 import '../widgets/piano_roll_screen.dart';
 import '../widgets/tap_tempo_button.dart';
+import '../widgets/project_browser_screen.dart';
+import '../widgets/spectrum_visualizer.dart';
+import '../widgets/settings_screen.dart';
+import '../widgets/export_dialog.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -70,6 +77,16 @@ final automationServiceProvider = Provider<AutomationService>((ref) {
   ref.onDispose(() => service.dispose());
   return service;
 });
+
+final projectBrowserServiceProvider = Provider<ProjectBrowserService>((ref) => ProjectBrowserService());
+
+final spectrumServiceProvider = Provider<SpectrumService>((ref) {
+  final service = SpectrumService();
+  ref.onDispose(() => service.dispose());
+  return service;
+});
+
+final settingsServiceProvider = Provider<SettingsService>((ref) => SettingsService());
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -323,7 +340,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     } else if (event.logicalKey == LogicalKeyboardKey.keyO && HardwareKeyboard.instance.isControlPressed) {
       _showLoadDialog(context, ref, ref.read(projectServiceProvider), notifier);
     } else if (event.logicalKey == LogicalKeyboardKey.keyE && HardwareKeyboard.instance.isControlPressed) {
-      _exportProject(context, ref.read(exportServiceProvider), state);
+      _showExportDialog(context, ref, state);
     } else if (event.logicalKey == LogicalKeyboardKey.keyM) {
       _toggleMetronome(ref);
     } else if (event.logicalKey == LogicalKeyboardKey.keyC) {
@@ -358,7 +375,6 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     final state = ref.watch(sequencerProvider);
     final notifier = ref.read(sequencerProvider.notifier);
     final projectService = ref.read(projectServiceProvider);
-    final exportService = ref.read(exportServiceProvider);
     final recordingService = ref.read(recordingServiceProvider);
     final patternService = ref.read(patternServiceProvider);
     final mixerService = ref.read(mixerServiceProvider);
@@ -366,6 +382,9 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     final metronomeService = ref.watch(metronomeServiceProvider);
     final sampleService = ref.read(sampleServiceProvider);
     final automationService = ref.read(automationServiceProvider);
+    final projectBrowserService = ref.read(projectBrowserServiceProvider);
+    final spectrumService = ref.watch(spectrumServiceProvider);
+    final settingsService = ref.read(settingsServiceProvider);
 
     return KeyboardListener(
       focusNode: _focusNode,
@@ -376,7 +395,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
         appBar: ModernAppBar(
           onSave: () => _showSaveDialog(context, ref, state),
           onLoad: () => _showLoadDialog(context, ref, projectService, notifier),
-          onExport: () => _exportProject(context, exportService, state),
+          onExport: () => _showExportDialog(context, ref, state),
           onPresets: () => _showPresetDialog(context, ref, notifier),
           onPatterns: () => _showPatternDialog(context, ref, patternService, notifier),
           onRandomizer: () => _showRandomizerDialog(context, ref, randomizerService, notifier),
@@ -403,7 +422,8 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               isPlaying: metronomeService.isPlaying,
               onToggle: () => _toggleMetronome(ref),
             ),
-            Padding(
+            // Spectrum Visualizer
+            Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 children: [
@@ -450,6 +470,15 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                 ],
               ),
             ),
+            // Spectrum
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+              height: 60,
+              child: SpectrumVisualizer(
+                spectrum: spectrumService.spectrum,
+                height: 60,
+              ),
+            ),
             Expanded(
               child: ModernStepSequencer(
                 tracks: state.tracks,
@@ -488,6 +517,24 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
         floatingActionButton: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            FloatingActionButton(
+              heroTag: 'projects',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => ProjectBrowserScreen(
+                    projectBrowserService: projectBrowserService,
+                    onProjectSelected: (project) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Проект "${project.name}" выбран')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.secondaryColor,
+              child: const Icon(Icons.folder_open_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
             FloatingActionButton(
               heroTag: 'samples',
               onPressed: () => Navigator.of(context).push(
@@ -531,6 +578,24 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               ),
               backgroundColor: AppTheme.successColor,
               child: const Icon(Icons.piano_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'settings',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(
+                    settingsService: settingsService,
+                    onSettingsChanged: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Настройки сохранены')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.warningColor,
+              child: const Icon(Icons.settings_rounded, color: Colors.white),
             ),
           ],
         ),
@@ -646,19 +711,38 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
     );
   }
 
-  void _exportProject(BuildContext context, ExportService exportService, SequencerState state) async {
-    final path = await exportService.exportWav(
-      state.tracks,
-      state.bpm,
-      masterVolume: state.masterVolume,
+  void _showExportDialog(BuildContext context, WidgetRef ref, SequencerState state) {
+    showDialog(
+      context: context,
+      builder: (context) => ExportDialog(
+        onExport: (format) async {
+          final exportService = ref.read(exportServiceProvider);
+          String? path;
+          if (format == 'WAV') {
+            path = await exportService.exportWav(
+              state.tracks,
+              state.bpm,
+              masterVolume: state.masterVolume,
+            );
+          } else if (format == 'MP3') {
+            path = await exportService.exportMp3(
+              state.tracks,
+              state.bpm,
+              masterVolume: state.masterVolume,
+            );
+          } else if (format == 'MIDI') {
+            path = await exportService.exportMidi(state.tracks, state.bpm);
+          }
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(path != null ? 'Экспортировано: $path' : 'Ошибка экспорта'),
+              ),
+            );
+          }
+        },
+      ),
     );
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(path != null ? 'Экспортировано: $path' : 'Ошибка экспорта'),
-        ),
-      );
-    }
   }
 
   void _showPresetDialog(BuildContext context, WidgetRef ref, SequencerNotifier notifier) {
