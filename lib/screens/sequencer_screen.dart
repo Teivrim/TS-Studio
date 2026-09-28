@@ -20,6 +20,8 @@ import '../services/settings_service.dart';
 import '../services/synth_service.dart';
 import '../services/midi_service.dart';
 import '../services/effect_service.dart';
+import '../services/loop_service.dart';
+import '../services/waveform_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/modern_step_sequencer.dart';
 import '../widgets/modern_transport.dart';
@@ -44,6 +46,8 @@ import '../widgets/effect_browser_screen.dart';
 import '../widgets/realtime_spectrum.dart';
 import '../widgets/chord_progression_screen.dart';
 import '../widgets/drum_pad_screen.dart';
+import '../widgets/loop_browser_screen.dart';
+import '../widgets/waveform_editor_screen.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -105,6 +109,10 @@ final midiServiceProvider = Provider<MidiService>((ref) {
 });
 
 final effectServiceProvider = Provider<EffectService>((ref) => EffectService());
+
+final loopServiceProvider = Provider<LoopService>((ref) => LoopService());
+
+final waveformServiceProvider = Provider<WaveformService>((ref) => WaveformService());
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -623,6 +631,34 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
             ),
             const SizedBox(height: 12),
             FloatingActionButton(
+              heroTag: 'loops',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => LoopBrowserScreen(
+                    onLoopSelected: (loop) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Луп "${loop.name}" выбран')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.dangerColor,
+              child: const Icon(Icons.loop_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'waveform',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => WaveformEditorScreen(),
+                ),
+              ),
+              backgroundColor: AppTheme.textSecondary,
+              child: const Icon(Icons.waves_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
               heroTag: 'midi',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -631,7 +667,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.dangerColor,
+              backgroundColor: AppTheme.textMuted,
               child: const Icon(Icons.usb_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),
@@ -649,7 +685,7 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
                   ),
                 ),
               ),
-              backgroundColor: AppTheme.textSecondary,
+              backgroundColor: AppTheme.borderColor,
               child: const Icon(Icons.library_music_rounded, color: Colors.white),
             ),
             const SizedBox(height: 12),

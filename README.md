@@ -46,6 +46,9 @@
 - **Realtime Spectrum** — спектр в реальном времени
 - **Chord Progressions** — аккордовые прогрессии
 - **Drum Pads** — драм-пэды
+- **Loop Browser** — браузер лупов
+- **Loop Sequencer** — секвенсер лупов
+- **Waveform Editor** — редактор волны
 
 ## Технологии
 
@@ -120,7 +123,10 @@ lib/
 │   ├── effect_browser_screen.dart # Браузер эффектов
 │   ├── realtime_spectrum.dart    # Спектр в реальном времени
 │   ├── chord_progression_screen.dart # Аккордовые прогрессии
-│   └── drum_pad_screen.dart      # Драм-пэды
+│   ├── drum_pad_screen.dart      # Драм-пэды
+│   ├── loop_browser_screen.dart  # Браузер лупов
+│   ├── loop_sequencer_screen.dart # Секвенсер лупов
+│   └── waveform_editor_screen.dart # Редактор волны
 ├── models/
 │   ├── track.dart                # Модели данных
 │   ├── pattern.dart              # Модели паттернов
@@ -128,7 +134,8 @@ lib/
 │   ├── sample.dart               # Модели сэмплов
 │   ├── project.dart              # Модели проектов
 │   ├── synth_preset.dart         # Модели пресетов синтезатора
-│   └── effect_preset.dart        # Модели пресетов эффектов
+│   ├── effect_preset.dart        # Модели пресетов эффектов
+│   └── loop.dart                 # Модели лупов
 ├── services/
 │   ├── audio_service.dart        # Аудио-сервис
 │   ├── project_service.dart      # Сервис проектов
@@ -148,6 +155,8 @@ lib/
 │   ├── synth_service.dart        # Сервис синтезатора
 │   ├── midi_service.dart         # MIDI сервис
 │   ├── effect_service.dart       # Сервис эффектов
+│   ├── loop_service.dart         # Сервис лупов
+│   ├── waveform_service.dart     # Сервис волны
 │   └── performance_service.dart  # Сервис производительности
 └── theme/
     └── app_theme.dart            # Тема приложения
