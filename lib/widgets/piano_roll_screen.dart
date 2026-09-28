@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import 'fl_button.dart';
+import 'modern_button.dart';
 
 class PianoRollScreen extends StatefulWidget {
   final int bpm;
@@ -30,18 +30,18 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
           'PIANO ROLL',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
             letterSpacing: 2,
           ),
         ),
         backgroundColor: AppTheme.surfaceColor,
         actions: [
-          FLButton(
-            icon: Icons.clear_all,
+          ModernButton(
+            icon: Icons.clear_all_rounded,
             onPressed: () => setState(() => _activeNotes.clear()),
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
           ),
         ],
       ),
@@ -49,11 +49,19 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
         children: [
           // Toolbar
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                const Text('BPM:', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary)),
-                const SizedBox(width: 8),
+                const Text(
+                  'BPM:',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.textSecondary,
+                    letterSpacing: 1,
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Slider(
                     value: widget.bpm.toDouble(),
@@ -66,13 +74,16 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: AppTheme.flButtonDecoration(color: AppTheme.buttonColor),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: AppTheme.modernButtonDecoration(
+                    color: AppTheme.surfaceLightColor,
+                    borderRadius: 12,
+                  ),
                   child: Text(
                     '${widget.bpm}',
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                       color: AppTheme.accentColor,
                     ),
                   ),
@@ -86,7 +97,7 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
               children: [
                 // Piano keys
                 SizedBox(
-                  width: 60,
+                  width: 64,
                   child: ListView.builder(
                     itemCount: _octaves * 12,
                     itemBuilder: (context, index) {
@@ -107,18 +118,21 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
                           });
                         },
                         child: Container(
-                          height: 24,
+                          height: 28,
                           decoration: BoxDecoration(
                             color: isBlack
                                 ? AppTheme.backgroundColor
                                 : AppTheme.surfaceColor,
-                            border: Border.all(color: AppTheme.borderColor.withValues(alpha: 0.3)),
+                            border: Border.all(
+                              color: AppTheme.borderColor.withValues(alpha: 0.2),
+                            ),
                           ),
                           child: Center(
                             child: Text(
                               '$noteName$octave',
                               style: TextStyle(
-                                fontSize: 8,
+                                fontSize: 9,
+                                fontWeight: FontWeight.w600,
                                 color: isBlack ? AppTheme.textSecondary : AppTheme.textPrimary,
                               ),
                             ),
@@ -131,13 +145,13 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
                 // Grid
                 Expanded(
                   child: Container(
-                    decoration: AppTheme.flPanelDecoration(),
+                    decoration: AppTheme.modernPanelDecoration(),
                     child: GridView.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 16,
                         childAspectRatio: 1,
-                        crossAxisSpacing: 1,
-                        mainAxisSpacing: 1,
+                        crossAxisSpacing: 2,
+                        mainAxisSpacing: 2,
                       ),
                       itemCount: _octaves * 12 * 16,
                       itemBuilder: (context, index) {
@@ -166,7 +180,12 @@ class _PianoRollScreenState extends State<PianoRollScreen> {
                                   : isBeat
                                       ? AppTheme.inactiveStepColor
                                       : AppTheme.gridColor,
-                              borderRadius: BorderRadius.circular(2),
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(
+                                color: isActive
+                                    ? AppTheme.primaryColor.withValues(alpha: 0.5)
+                                    : Colors.white.withValues(alpha: 0.05),
+                              ),
                             ),
                           ),
                         );

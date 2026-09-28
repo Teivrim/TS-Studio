@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/automation_service.dart';
 import '../theme/app_theme.dart';
-import 'fl_button.dart';
+import 'modern_button.dart';
 
 class AutomationScreen extends StatefulWidget {
   final AutomationService automationService;
@@ -22,18 +22,18 @@ class _AutomationScreenState extends State<AutomationScreen> {
           'AUTOMATION',
           style: TextStyle(
             fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             color: AppTheme.textPrimary,
             letterSpacing: 2,
           ),
         ),
         backgroundColor: AppTheme.surfaceColor,
         actions: [
-          FLButton(
-            icon: Icons.add,
+          ModernButton(
+            icon: Icons.add_rounded,
             onPressed: _showAddLaneDialog,
-            width: 40,
-            height: 40,
+            width: 44,
+            height: 44,
           ),
         ],
       ),
@@ -41,11 +41,13 @@ class _AutomationScreenState extends State<AutomationScreen> {
         children: [
           // Transport
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
             child: Row(
               children: [
-                FLButton(
-                  icon: widget.automationService.isPlaying ? Icons.pause : Icons.play_arrow,
+                ModernButton(
+                  icon: widget.automationService.isPlaying
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
                   onPressed: () {
                     if (widget.automationService.isPlaying) {
                       widget.automationService.pause();
@@ -54,27 +56,27 @@ class _AutomationScreenState extends State<AutomationScreen> {
                     }
                     setState(() {});
                   },
-                  width: 48,
-                  height: 48,
+                  width: 56,
+                  height: 56,
                   isPrimary: true,
                 ),
-                const SizedBox(width: 8),
-                FLButton(
-                  icon: Icons.stop,
+                const SizedBox(width: 12),
+                ModernButton(
+                  icon: Icons.stop_rounded,
                   onPressed: () {
                     widget.automationService.stop();
                     setState(() {});
                   },
-                  width: 48,
-                  height: 48,
+                  width: 56,
+                  height: 56,
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 24),
                 Expanded(
                   child: Text(
                     'Time: ${widget.automationService.currentTime.toStringAsFixed(2)}s',
                     style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
                       color: AppTheme.accentColor,
                     ),
                   ),
@@ -103,7 +105,10 @@ class _AutomationScreenState extends State<AutomationScreen> {
                           setState(() {});
                         },
                         onAddPoint: (time, value) {
-                          widget.automationService.addPoint(lane.id, AutomationPoint(time, value));
+                          widget.automationService.addPoint(
+                            lane.id,
+                            AutomationPoint(time, value),
+                          );
                           setState(() {});
                         },
                       );
@@ -185,18 +190,23 @@ class _AutomationLaneWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-      decoration: AppTheme.flPanelDecoration(),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: AppTheme.modernPanelDecoration(),
       child: Column(
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: AppTheme.buttonColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(4),
-                topRight: Radius.circular(4),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppTheme.surfaceLightColor.withValues(alpha: 0.3),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+              border: Border(
+                bottom: BorderSide(
+                  color: AppTheme.borderColor.withValues(alpha: 0.2),
+                ),
               ),
             ),
             child: Row(
@@ -205,8 +215,8 @@ class _AutomationLaneWidget extends StatelessWidget {
                   child: Text(
                     lane.name,
                     style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
                       color: AppTheme.textPrimary,
                     ),
                   ),
@@ -214,23 +224,23 @@ class _AutomationLaneWidget extends StatelessWidget {
                 Text(
                   lane.parameter,
                   style: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 11,
                     color: AppTheme.textSecondary,
                   ),
                 ),
-                const SizedBox(width: 8),
-                FLButton(
-                  icon: Icons.delete,
+                const SizedBox(width: 12),
+                ModernButton(
+                  icon: Icons.delete_outline_rounded,
                   onPressed: onDelete,
-                  width: 28,
-                  height: 28,
+                  width: 36,
+                  height: 36,
                 ),
               ],
             ),
           ),
           // Automation curve
           SizedBox(
-            height: 100,
+            height: 120,
             child: GestureDetector(
               onTapUp: (details) {
                 final box = context.findRenderObject() as RenderBox;
@@ -268,7 +278,7 @@ class _AutomationPainter extends CustomPainter {
       ..style = PaintingStyle.stroke;
 
     final fillPaint = Paint()
-      ..color = AppTheme.primaryColor.withValues(alpha: 0.2)
+      ..color = AppTheme.primaryColor.withValues(alpha: 0.15)
       ..style = PaintingStyle.fill;
 
     if (points.isEmpty) return;
@@ -315,7 +325,7 @@ class _AutomationPainter extends CustomPainter {
     for (final point in points) {
       final x = (point.time / 10) * size.width;
       final y = size.height - (point.value * size.height);
-      canvas.drawCircle(Offset(x, y), 4, pointPaint);
+      canvas.drawCircle(Offset(x, y), 5, pointPaint);
     }
   }
 

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-class FLMetronome extends StatefulWidget {
+class ModernMetronome extends StatefulWidget {
   final int currentBeat;
   final bool isPlaying;
   final VoidCallback onToggle;
 
-  const FLMetronome({
+  const ModernMetronome({
     super.key,
     required this.currentBeat,
     required this.isPlaying,
@@ -14,10 +14,10 @@ class FLMetronome extends StatefulWidget {
   });
 
   @override
-  State<FLMetronome> createState() => _FLMetronomeState();
+  State<ModernMetronome> createState() => _ModernMetronomeState();
 }
 
-class _FLMetronomeState extends State<FLMetronome> with SingleTickerProviderStateMixin {
+class _ModernMetronomeState extends State<ModernMetronome> with SingleTickerProviderStateMixin {
   late AnimationController _pulseController;
 
   @override
@@ -30,7 +30,7 @@ class _FLMetronomeState extends State<FLMetronome> with SingleTickerProviderStat
   }
 
   @override
-  void didUpdateWidget(FLMetronome oldWidget) {
+  void didUpdateWidget(ModernMetronome oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.currentBeat != oldWidget.currentBeat && widget.isPlaying) {
       _pulseController.forward().then((_) => _pulseController.reverse());
@@ -46,19 +46,29 @@ class _FLMetronomeState extends State<FLMetronome> with SingleTickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
         color: AppTheme.surfaceColor,
         border: Border(
-          bottom: BorderSide(color: AppTheme.borderColor, width: 1),
+          bottom: BorderSide(
+            color: AppTheme.borderColor.withValues(alpha: 0.3),
+          ),
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.timer, size: 20, color: AppTheme.textSecondary),
-          const SizedBox(width: 8),
-          const Text('METRONOME', style: TextStyle(fontSize: 10, color: AppTheme.textSecondary, letterSpacing: 1)),
-          const SizedBox(width: 16),
+          const Icon(Icons.timer_rounded, size: 20, color: AppTheme.textSecondary),
+          const SizedBox(width: 12),
+          const Text(
+            'METRONOME',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.textSecondary,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(width: 20),
           // Beat indicators
           Row(
             children: List.generate(4, (index) {
@@ -67,11 +77,12 @@ class _FLMetronomeState extends State<FLMetronome> with SingleTickerProviderStat
               return AnimatedBuilder(
                 animation: _pulseController,
                 builder: (context, child) {
-                  return Container(
-                    width: 24,
-                    height: 24,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: AppTheme.flLedDecoration(
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 150),
+                    width: 32,
+                    height: 32,
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    decoration: AppTheme.ledDecoration(
                       isOn: isActive,
                       color: isFirst ? AppTheme.dangerColor : AppTheme.accentColor,
                     ),
@@ -79,9 +90,9 @@ class _FLMetronomeState extends State<FLMetronome> with SingleTickerProviderStat
                       child: Text(
                         '${index + 1}',
                         style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: isActive ? Colors.black : AppTheme.textSecondary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: isActive ? Colors.white : AppTheme.textMuted,
                         ),
                       ),
                     ),
@@ -94,19 +105,23 @@ class _FLMetronomeState extends State<FLMetronome> with SingleTickerProviderStat
           // Toggle button
           GestureDetector(
             onTap: widget.onToggle,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: AppTheme.flButtonDecoration(
-                color: widget.isPlaying ? AppTheme.dangerColor.withValues(alpha: 0.3) : AppTheme.buttonColor,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: AppTheme.modernButtonDecoration(
+                color: widget.isPlaying
+                    ? AppTheme.dangerColor.withValues(alpha: 0.2)
+                    : AppTheme.surfaceLightColor,
                 isPrimary: widget.isPlaying,
+                borderRadius: 12,
               ),
               child: Text(
                 widget.isPlaying ? 'STOP' : 'START',
                 style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
                   color: widget.isPlaying ? AppTheme.dangerColor : AppTheme.textPrimary,
-                  letterSpacing: 1,
+                  letterSpacing: 1.5,
                 ),
               ),
             ),
