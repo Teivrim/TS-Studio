@@ -1,0 +1,28 @@
+{
+  "sessions": {
+    "ses_f18c62e96ffeVSh8M5l9ndInHI": {
+      "sessionID": "ses_f18c62e96ffeVSh8M5l9ndInHI",
+      "goal": "РАБОТАЙ ДАЛЬШЕ, ЛЮБЫЕ ВОПРОС РЕШАЙ САМ, ТВОЯ ЦЕЛЬ РЕШИТЬ ЗАДАЧУ МАКСИМАЛЬНО ЭФФЕКТИВНО",
+      "cycles": 0,
+      "armed": true,
+      "lastSeen": "2026-09-29T17:46:17.398Z",
+      "resumes": 0
+    },
+    "ses_f1d73dfd9ffdwlsHkmHydUi6Zw": {
+      "sessionID": "ses_f1d73dfd9ffdwlsHkmHydUi6Zw",
+      "goal": "СТОЯТЬ БЛЯТЬ",
+      "cycles": 0,
+      "armed": true,
+      "lastSeen": "2026-09-29T17:46:17.398Z",
+      "resumes": 0
+    },
+    "ses_f1d74ff58ffeQCo4qqVbeStaFe": {
+      "sessionID": "ses_f1d74ff58ffeQCo4qqVbeStaFe",
+      "goal": "ты забыл что ты делаешь редактор длдя музыки, давай хуярь его",
+      "cycles": 0,
+      "armed": true,
+      "lastSeen": "2026-09-29T17:46:17.398Z",
+      "resumes": 0
+    }
+  }
+}
