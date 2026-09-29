@@ -1,0 +1,20 @@
+{
+  "sessions": {
+    "ses_f1d74ff58ffeQCo4qqVbeStaFe": {
+      "sessionID": "ses_f1d74ff58ffeQCo4qqVbeStaFe",
+      "goal": "работай дальше",
+      "cycles": 0,
+      "armed": true,
+      "lastSeen": "2026-09-29T11:59:11.072Z",
+      "resumes": 0
+    },
+    "ses_f1d73dfd9ffdwlsHkmHydUi6Zw": {
+      "sessionID": "ses_f1d73dfd9ffdwlsHkmHydUi6Zw",
+      "goal": "ищи дальше",
+      "cycles": 0,
+      "armed": true,
+      "lastSeen": "2026-09-28T16:16:42.554Z",
+      "resumes": 0
+    }
+  }
+}
