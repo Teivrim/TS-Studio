@@ -22,6 +22,7 @@ import '../services/midi_service.dart';
 import '../services/effect_service.dart';
 import '../services/loop_service.dart';
 import '../services/waveform_service.dart';
+import '../services/sample_pack_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/modern_step_sequencer.dart';
 import '../widgets/modern_transport.dart';
@@ -48,6 +49,10 @@ import '../widgets/chord_progression_screen.dart';
 import '../widgets/drum_pad_screen.dart';
 import '../widgets/loop_browser_screen.dart';
 import '../widgets/waveform_editor_screen.dart';
+import '../widgets/sample_pack_browser.dart';
+import '../widgets/master_section_screen.dart';
+import '../widgets/tempo_tapper_screen.dart';
+import '../widgets/about_screen.dart';
 
 final audioServiceProvider = Provider<AudioService>((ref) {
   final service = AudioService();
@@ -113,6 +118,8 @@ final effectServiceProvider = Provider<EffectService>((ref) => EffectService());
 final loopServiceProvider = Provider<LoopService>((ref) => LoopService());
 
 final waveformServiceProvider = Provider<WaveformService>((ref) => WaveformService());
+
+final samplePackServiceProvider = Provider<SamplePackService>((ref) => SamplePackService());
 
 final sequencerProvider = StateNotifierProvider<SequencerNotifier, SequencerState>((ref) {
   final audioService = ref.watch(audioServiceProvider);
@@ -659,6 +666,54 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
             ),
             const SizedBox(height: 12),
             FloatingActionButton(
+              heroTag: 'packs',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SamplePackBrowser(
+                    onPackSelected: (pack) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Пак "${pack.name}" выбран')),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.textMuted,
+              child: const Icon(Icons.folder_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'master',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MasterSectionScreen(
+                    masterVolume: state.masterVolume,
+                    reverbMix: state.reverbMix,
+                    delayMix: state.delayMix,
+                    onMasterVolumeChanged: (v) => notifier.setMasterVolume(v),
+                    onReverbMixChanged: (v) => notifier.setReverbMix(v),
+                    onDelayMixChanged: (v) => notifier.setDelayMix(v),
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.borderColor,
+              child: const Icon(Icons.volume_up_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'tempo',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => TempoTapperScreen(
+                    onBpmChanged: (bpm) => notifier.setBpm(bpm),
+                  ),
+                ),
+              ),
+              backgroundColor: AppTheme.textSecondary,
+              child: const Icon(Icons.timer_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
               heroTag: 'midi',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
@@ -732,6 +787,17 @@ class _SequencerScreenState extends ConsumerState<SequencerScreen> {
               ),
               backgroundColor: AppTheme.textSecondary,
               child: const Icon(Icons.settings_rounded, color: Colors.white),
+            ),
+            const SizedBox(height: 12),
+            FloatingActionButton(
+              heroTag: 'about',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const AboutScreen(),
+                ),
+              ),
+              backgroundColor: AppTheme.textMuted,
+              child: const Icon(Icons.info_outline_rounded, color: Colors.white),
             ),
           ],
         ),

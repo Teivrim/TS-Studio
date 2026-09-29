@@ -1,7 +1,7 @@
 name: ts_studio
 description: Teivrim Sound Studio (TS Studio) - мобильная музыкальная студия для Android
 publish_to: 'none'
-version: 1.1.0+1
+version: 1.2.0+1
 
 environment:
   sdk: ^3.6.0
