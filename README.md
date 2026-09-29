@@ -49,6 +49,10 @@
 - **Loop Browser** — браузер лупов
 - **Loop Sequencer** — секвенсер лупов
 - **Waveform Editor** — редактор волны
+- **Sample Pack Browser** — браузер паков сэмплов
+- **Master Section** — мастер-секция
+- **Tempo Tapper** — тап-темпо
+- **About** — информация о приложении
 
 ## Технологии
 
@@ -126,7 +130,11 @@ lib/
 │   ├── drum_pad_screen.dart      # Драм-пэды
 │   ├── loop_browser_screen.dart  # Браузер лупов
 │   ├── loop_sequencer_screen.dart # Секвенсер лупов
-│   └── waveform_editor_screen.dart # Редактор волны
+│   ├── waveform_editor_screen.dart # Редактор волны
+│   ├── sample_pack_browser.dart  # Браузер паков сэмплов
+│   ├── master_section_screen.dart # Мастер-секция
+│   ├── tempo_tapper_screen.dart # Тап-темпо
+│   └── about_screen.dart         # О приложении
 ├── models/
 │   ├── track.dart                # Модели данных
 │   ├── pattern.dart              # Модели паттернов
@@ -135,7 +143,8 @@ lib/
 │   ├── project.dart              # Модели проектов
 │   ├── synth_preset.dart         # Модели пресетов синтезатора
 │   ├── effect_preset.dart        # Модели пресетов эффектов
-│   └── loop.dart                 # Модели лупов
+│   ├── loop.dart                 # Модели лупов
+│   └── sample_pack.dart          # Модели паков сэмплов
 ├── services/
 │   ├── audio_service.dart        # Аудио-сервис
 │   ├── project_service.dart      # Сервис проектов
@@ -157,6 +166,7 @@ lib/
 │   ├── effect_service.dart       # Сервис эффектов
 │   ├── loop_service.dart         # Сервис лупов
 │   ├── waveform_service.dart     # Сервис волны
+│   ├── sample_pack_service.dart  # Сервис паков сэмплов
 │   └── performance_service.dart  # Сервис производительности
 └── theme/
     └── app_theme.dart            # Тема приложения
