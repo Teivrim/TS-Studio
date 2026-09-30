@@ -1,0 +1,12 @@
+{
+  "sessions": {
+    "ses_f1d74ff58ffeQCo4qqVbeStaFe": {
+      "sessionID": "ses_f1d74ff58ffeQCo4qqVbeStaFe",
+      "goal": "приложение слишком много жрет, захости его где то в бесплатном хостинге и тестируй только там",
+      "cycles": 0,
+      "armed": true,
+      "lastSeen": "2026-09-30T10:06:20.105Z",
+      "resumes": 0
+    }
+  }
+}
